@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd sling-app-expo-main/sling-app-expo-main && npm install && npx expo export -p web",
+  "outputDirectory": "sling-app-expo-main/sling-app-expo-main/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
