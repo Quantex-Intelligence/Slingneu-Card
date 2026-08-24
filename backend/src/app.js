@@ -31,9 +31,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sling-bac
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// CORS Configuration - Allow any origin
+// CORS Configuration - Allow dynamic origin with credentials
 const corsOptions = {
-  origin: '*', // Allow any origin
+  origin: function (origin, callback) {
+    callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   credentials: true,

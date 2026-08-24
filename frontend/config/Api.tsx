@@ -18,7 +18,7 @@ export default {
     headers["Accept"] = "application/json";
 
     if (bodyData instanceof FormData) {
-      headers["Content-Type"] = "multipart/form-data";
+      delete headers["Content-Type"];
     }
 
     if(token){

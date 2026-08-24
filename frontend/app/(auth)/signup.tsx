@@ -227,11 +227,21 @@ export default function Signup() {
         const match = /\.(\w+)$/.exec(filename);
         const type = match ? `image/${match[1]}` : "image/jpeg";
 
-        formData.append("profile", {
-          uri: imageUri,
-          name: filename,
-          type: type,
-        } as any);
+        if (Platform.OS === "web") {
+          try {
+            const blobRes = await fetch(imageUri);
+            const blob = await blobRes.blob();
+            formData.append("profile", blob, filename);
+          } catch (e) {
+            console.error("Error creating image blob for web:", e);
+          }
+        } else {
+          formData.append("profile", {
+            uri: imageUri,
+            name: filename,
+            type: type,
+          } as any);
+        }
       }
 
       console.log("🔔 [Signup] Sending signup request with form data...");
