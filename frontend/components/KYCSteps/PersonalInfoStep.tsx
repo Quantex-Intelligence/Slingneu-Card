@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import {
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -176,40 +177,77 @@ export default function PersonalInfoStep({
 
       <View style={styles.inputWrapper}>
         <Text style={styles.label}>Date of Birth (Must be 18 or older) <Text style={styles.required}>*</Text></Text>
-        <TouchableOpacity
-          style={styles.inputContainer}
-          onPress={() => setDatePickerVisible(true)}
-        >
-          <MaterialCommunityIcons
-            name="calendar"
-            size={24}
-            color="#6c56f9"
-            style={styles.inputIcon}
-          />
-          <Text
-            style={[
-              styles.input,
-              !formData.dateInfo[0].date && styles.placeholder,
-            ]}
-          >
-            {formData.dateInfo[0].date || "Select Date of Birth"}
-          </Text>
-        </TouchableOpacity>
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={(date) => {
-            setDatePickerVisible(false);
-            onInputChange("dateInfo", [
-              {
-                dateType: "DOB",
-                date: date.toISOString().split("T")[0],
-              },
-            ]);
-          }}
-          onCancel={() => setDatePickerVisible(false)}
-          maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
-        />
+        {Platform.OS === "web" ? (
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons
+              name="calendar"
+              size={24}
+              color="#6c56f9"
+              style={styles.inputIcon}
+            />
+            <input
+              type="date"
+              style={{
+                flex: 1,
+                padding: "10px 4px",
+                fontSize: "13px",
+                color: "#1F2937",
+                border: "none",
+                outline: "none",
+                backgroundColor: "transparent",
+                fontFamily: "inherit",
+                cursor: "pointer",
+              }}
+              max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split("T")[0]}
+              value={formData.dateInfo[0]?.date || ""}
+              onChange={(e) => {
+                onInputChange("dateInfo", [
+                  {
+                    dateType: "DOB",
+                    date: e.target.value,
+                  },
+                ]);
+              }}
+            />
+          </View>
+        ) : (
+          <>
+            <TouchableOpacity
+              style={styles.inputContainer}
+              onPress={() => setDatePickerVisible(true)}
+            >
+              <MaterialCommunityIcons
+                name="calendar"
+                size={24}
+                color="#6c56f9"
+                style={styles.inputIcon}
+              />
+              <Text
+                style={[
+                  styles.input,
+                  !formData.dateInfo[0]?.date && styles.placeholder,
+                ]}
+              >
+                {formData.dateInfo[0]?.date || "Select Date of Birth"}
+              </Text>
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={(date) => {
+                setDatePickerVisible(false);
+                onInputChange("dateInfo", [
+                  {
+                    dateType: "DOB",
+                    date: date.toISOString().split("T")[0],
+                  },
+                ]);
+              }}
+              onCancel={() => setDatePickerVisible(false)}
+              maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
+            />
+          </>
+        )}
       </View>
     </View>
   );
