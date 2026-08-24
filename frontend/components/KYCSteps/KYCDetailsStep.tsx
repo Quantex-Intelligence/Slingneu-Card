@@ -13,6 +13,10 @@ interface KYCDetailsStepProps {
 
 const DOCUMENT_TYPES = [
   { label: "PAN Card", value: "PAN" },
+  { label: "Aadhaar Card", value: "AADHAAR" },
+  { label: "Voter ID", value: "VOTER_ID" },
+  { label: "Passport", value: "PASSPORT" },
+  { label: "Driving License", value: "DRIVING_LICENSE" },
 ];
 
 export default function KYCDetailsStep({
@@ -41,7 +45,6 @@ export default function KYCDetailsStep({
             selectedValue={kycInfo.documentType}
             onValueChange={handleDocumentTypeChange}
             style={styles.picker}
-            enabled={false}
           >
             {DOCUMENT_TYPES.map((type) => (
               <Picker.Item key={type.value} label={type.label} value={type.value} />
@@ -51,7 +54,14 @@ export default function KYCDetailsStep({
       </View>
 
       <View style={styles.inputWrapper}>
-        <Text style={styles.label}>PAN Number <Text style={styles.required}>*</Text></Text>
+        <Text style={styles.label}>
+          {kycInfo.documentType === "PAN"
+            ? "PAN Number (e.g. ABCDE1234F)"
+            : kycInfo.documentType === "AADHAAR"
+            ? "Aadhaar Number (12 digits)"
+            : "Document Number"}{" "}
+          <Text style={styles.required}>*</Text>
+        </Text>
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             name="card-account-details"
@@ -61,10 +71,16 @@ export default function KYCDetailsStep({
           />
           <TextInput
             style={styles.input}
-            placeholder="Enter PAN number"
+            placeholder={
+              kycInfo.documentType === "PAN"
+                ? "Enter 10-character PAN (e.g. ABCDE1234F)"
+                : kycInfo.documentType === "AADHAAR"
+                ? "Enter 12-digit Aadhaar number"
+                : "Enter document number"
+            }
             value={kycInfo.documentNo}
             onChangeText={(value) => onKYCChange("documentNo", value.toUpperCase())}
-            maxLength={10}
+            maxLength={kycInfo.documentType === "AADHAAR" ? 12 : 15}
             autoCapitalize="characters"
           />
         </View>

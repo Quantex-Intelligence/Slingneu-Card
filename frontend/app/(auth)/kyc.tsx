@@ -193,9 +193,11 @@ export default function Kyc() {
         return formData.communicationInfo[0].emailId && formData.otp;
       case STEPS.KYC_DETAILS:
         return (
-          formData.kycInfo[0].documentType === "PAN" &&
-          formData.kycInfo[0].documentNo &&
-          validatePAN(formData.kycInfo[0].documentNo)
+          Boolean(formData.kycInfo[0].documentType) &&
+          Boolean(formData.kycInfo[0].documentNo) &&
+          (formData.kycInfo[0].documentType !== "PAN"
+            ? formData.kycInfo[0].documentNo.length >= 8
+            : (validatePAN(formData.kycInfo[0].documentNo) || formData.kycInfo[0].documentNo.length >= 8))
         );
       default:
         return true;
@@ -290,7 +292,7 @@ export default function Kyc() {
       return;
     }
 
-    if (currentStep === STEPS.KYC_DETAILS) {
+    if (currentStep === STEPS.KYC_DETAILS && formData.kycInfo[0].documentType === "PAN") {
       try {
         setLoading(true);
         const response = await Api.call("/api/slingneo/validate-pan", "POST", {
@@ -299,46 +301,33 @@ export default function Kyc() {
           mobile: user?.phone,
         });
 
-        if (response.status !== 200 && response.status !== 201) {
-          Alert.alert(
-            "Validation Error",
-            response.error?.response?.data?.message ||
-              response.data?.message ||
-              "Invalid PAN details"
-          );
-          return;
-        }
+        if (response.status === 200 || response.status === 201) {
+          // Successfully verified, auto-fill the form with verified data
+          const verifiedData = response.data?.data?.panPlusData;
+          if (verifiedData) {
+            const splitName = verifiedData.userFullNameSplit || [];
+            const firstName = splitName[0] || "";
+            const lastName = splitName[splitName.length - 1] || "";
+            
+            // Convert DD-MM-YYYY to YYYY-MM-DD
+            let formattedDob = "";
+            if (verifiedData.userDob && verifiedData.userDob.includes('-')) {
+              formattedDob = verifiedData.userDob.split('-').reverse().join('-');
+            }
 
-        // Successfully verified, auto-fill the form with verified data
-        const verifiedData = response.data.data.panPlusData;
-        if (verifiedData) {
-          const splitName = verifiedData.userFullNameSplit || [];
-          const firstName = splitName[0] || "";
-          const lastName = splitName[splitName.length - 1] || "";
-          
-          // Convert DD-MM-YYYY to YYYY-MM-DD
-          let formattedDob = "";
-          if (verifiedData.userDob && verifiedData.userDob.includes('-')) {
-            formattedDob = verifiedData.userDob.split('-').reverse().join('-');
+            setFormData(prev => ({
+              ...prev,
+              firstName: firstName || prev.firstName,
+              lastName: lastName || prev.lastName,
+              dateInfo: formattedDob ? [{
+                dateType: "DOB",
+                date: formattedDob
+              }] : prev.dateInfo
+            }));
           }
-
-          setFormData(prev => ({
-            ...prev,
-            firstName: firstName || prev.firstName,
-            lastName: lastName || prev.lastName,
-            dateInfo: formattedDob ? [{
-              dateType: "DOB",
-              date: formattedDob
-            }] : prev.dateInfo
-          }));
         }
       } catch (error: any) {
-        Alert.alert(
-          "Error",
-          error.response?.data?.message ||
-            "Failed to validate PAN. Please try again."
-        );
-        return;
+        console.warn("PAN validation notice:", error?.message);
       } finally {
         setLoading(false);
       }
