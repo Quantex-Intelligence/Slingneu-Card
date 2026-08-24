@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Expo / Builds
+.expo/
+dist/
+web-build/
+*.apk
+
+# Environment & Keys
+.env*.local
+*.p8
+*.pem
+*.key
+*.jks
+
+# Logs & Temporary Files
+*.log
+*.csv
+.qodo/
+.vscode/
+
+# OS Files
+.DS_Store
+Thumbs.db

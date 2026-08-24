@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675460634307",
+    "project_id": "slingneomobile",
+    "storage_bucket": "slingneomobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675460634307:android:4f04a8e3dc4d5723c6b476",
+        "android_client_info": {
+          "package_name": "com.sling.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4DWl5K5aJ28LanJnSKed1ompfEm4y2FA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

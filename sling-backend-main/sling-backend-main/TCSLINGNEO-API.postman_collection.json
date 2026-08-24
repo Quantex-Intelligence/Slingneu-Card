@@ -1,0 +1,471 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "SLINGNEO API Integration",
+		"description": "Collection for SLINGNEO API Integration Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Check User Exists",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"919840397473\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/check-user",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "check-user"]
+						}
+					}
+				},
+				{
+					"name": "Send OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"919840397473\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/send-otp",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "send-otp"]
+						}
+					}
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"919840397473\",\n    \"otp\": \"1234\",\n    \"orderId\": \"order_id_from_send_otp_response\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/verify-otp",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "verify-otp"]
+						}
+					}
+				},
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "John Doe",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "919840397473",
+									"type": "text"
+								},
+								{
+									"key": "profile",
+									"type": "file",
+									"src": [],
+									"description": "Optional profile image upload"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/signup",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "signup"]
+						}
+					}
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"919840397473\",\n    \"otp\": \"1234\",\n    \"orderId\": \"order_id_from_send_otp_response\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/update-profile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "update-profile"]
+						}
+					}
+				},
+				{
+					"name": "Upload Profile Image",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profile",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/upload-profile-image",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "upload-profile-image"]
+						}
+					}
+				},
+				{
+					"name": "Update Profile Image",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "profile",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/update-profile-image",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "update-profile-image"]
+						}
+					}
+				},
+				{
+					"name": "Delete Profile Image",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/delete-profile-image",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "delete-profile-image"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Generate OTP",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\",\n    \"mobileNumber\": \"+919840397473\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/generate-otp",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "generate-otp"]
+				}
+			}
+		},
+		{
+			"name": "Register Customer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\",\n    \"channelName\": \"MIN_KYC\",\n    \"entityType\": \"CUSTOMER\",\n    \"businessType\": \"TCSLINGNEO\",\n    \"businessId\": \"TCSLINGNEO123458\",\n    \"title\": \"Mr\",\n    \"otp\": \"623853\",\n    \"firstName\": \"Kalyani\",\n    \"middleName\": \"V\",\n    \"lastName\": \"J\",\n    \"gender\": \"MALE\",\n    \"isNRICustomer\": false,\n    \"isMinor\": false,\n    \"isDependant\": false,\n    \"maritalStatus\": \"SINGLE\",\n    \"countryCode\": \"91\",\n    \"employmentIndustry\": \"INFORMATION_TECHNOLOGY\",\n    \"employmentType\": \"EMPLOYED\",\n    \"plasticCode\": \"TYPE1\",\n    \"addressInfo\": [\n        {\n            \"addressCategory\": \"PERMANENT\",\n            \"address1\": \"F2 AMPA FLATS\",\n            \"address2\": \"NSK ROAD 2ND STREET\",\n            \"address3\": \"TNAGAR\",\n            \"city\": \"CHENNAI\",\n            \"state\": \"TAMILNADU\",\n            \"country\": \"INDIA\",\n            \"pinCode\": \"600028\"\n        }\n    ],\n    \"communicationInfo\": [\n        {\n            \"contactNo\": \"+919840397473\",\n            \"notification\": true,\n            \"emailId\": \"kesavvel@gmail.com\"\n        }\n    ],\n    \"kitInfo\": [\n        {\n            \"cardType\": \"VIRTUAL\",\n            \"cardCategory\": \"PREPAID\",\n            \"cardRegStatus\": \"ACTIVE\",\n            \"aliasName\": \"Naren Viswanath\"\n        }\n    ],\n    \"kycInfo\": [\n        {\n            \"documentType\": \"PAN\",\n            \"documentNo\": \"DBZBS3456X\",\n            \"documentExpiry\": \"2099-03-01\"\n        }\n    ],\n    \"dateInfo\": [\n        {\n            \"dateType\": \"DOB\",\n            \"date\": \"1984-02-05\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/register",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "register"]
+				}
+			}
+		},
+		{
+			"name": "Load Wallet",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 10,\n    \"businessEntityId\": \"TCSLINGNEO\",\n    \"fromEntityId\": \"TCSLINGNEO\",\n    \"businessType\": \"TCSLINGNEO\",\n    \"description\": \"Testing_loadd\",\n    \"toEntityId\": \"TCSLINGNEO123458\",\n    \"productId\": \"GENERAL\",\n    \"fromProductId\": \"BUSINESS\",\n    \"transactionOrigin\": \"MOBILE\",\n    \"externalTransactionId\": \"B2C_TCYrrY\",\n    \"transactionType\": \"B2C\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/load-wallet",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "load-wallet"]
+				}
+			}
+		},
+		{
+			"name": "Fetch Balance",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/balance/TCSLINGNEO123458",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "balance", "TCSLINGNEO123458"]
+				}
+			}
+		},
+		{
+			"name": "Lock/Unlock Card",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\",\n    \"flag\": \"UL\",\n    \"kitNo\": \"24150200142\",\n    \"reason\": \"card UNLOCK\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/card/lock-unlock",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "card", "lock-unlock"]
+				}
+			}
+		},
+		{
+			"name": "Replace Card",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\",\n    \"oldKitNo\": \"24150200142\",\n    \"newKitNo\": \"24150200093\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/card/replace",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "card", "replace"]
+				}
+			}
+		},
+		{
+			"name": "Request Physical Card",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\",\n    \"kitNo\": \"24150200142\",\n    \"addressDto\": {\n        \"address\": [\n            {\n                \"title\": \"DELIVERY\",\n                \"address1\": \"D-32, A Subhash Marg,\",\n                \"address2\": \"C-Scheme\",\n                \"city\": \"Jaipur\",\n                \"state\": \"Rajasthan\",\n                \"country\": \"India\",\n                \"pinCode\": \"302001\",\n                \"aliasName\": \"Digvijay Singh\",\n                \"fourthLine\": \" \"\n            }\n        ]\n    }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/card/physical",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "card", "physical"]
+				}
+			}
+		},
+		{
+			"name": "Get Card List",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/card/list",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "card", "list"]
+				}
+			}
+		},
+		{
+			"name": "Fetch Transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/transactions/TCSLINGNEO123458?fromDate=2025-06-01&toDate=2025-06-03&pageNumber=0&pageSize=5",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "transactions", "TCSLINGNEO123458"],
+					"query": [
+						{
+							"key": "fromDate",
+							"value": "2025-06-01"
+						},
+						{
+							"key": "toDate",
+							"value": "2025-06-03"
+						},
+						{
+							"key": "pageNumber",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "5"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Set Transaction Limit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\",\n    \"limitConfig\": {\n        \"txnType\": \"ECOM\",\n        \"dailyLimitValue\": \"1000\"\n    }\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/preferences/set-limit",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "preferences", "set-limit"]
+				}
+			}
+		},
+		{
+			"name": "Fetch Preferences",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"entityId\": \"TCSLINGNEO123458\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/slingneo/preferences/fetch",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "slingneo", "preferences", "fetch"]
+				}
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "your-jwt-token-here",
+			"type": "string"
+		}
+	]
+} 

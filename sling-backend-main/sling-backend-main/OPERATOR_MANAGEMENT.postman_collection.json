@@ -1,0 +1,677 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Operator Management API",
+		"description": "Complete Postman collection for managing operators, circle codes, and recharge plans",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Operators",
+			"item": [
+				{
+					"name": "Get All Operators",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/operators?page=1&limit=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "operators"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get all operators with pagination and filtering options"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Operators by Category",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/operators/category/mobile",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "operators", "category", "mobile"]
+						},
+						"description": "Get operators filtered by category (mobile, dth, postpaid, electricity, gas, insurance, datacard, fastag, other)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Operator by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/operators/{{operatorId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "operators", "{{operatorId}}"]
+						},
+						"description": "Get a specific operator by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Operator",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"NEW\",\n  \"name\": \"New Operator\",\n  \"category\": \"mobile\",\n  \"isActive\": true,\n  \"description\": \"New mobile operator\",\n  \"commission\": 2.5,\n  \"minAmount\": 10,\n  \"maxAmount\": 1000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/operators",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "operators"]
+						},
+						"description": "Create a new operator (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Operator",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated Operator Name\",\n  \"category\": \"mobile\",\n  \"isActive\": true,\n  \"description\": \"Updated description\",\n  \"commission\": 3.0,\n  \"minAmount\": 15,\n  \"maxAmount\": 1500\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/operators/{{operatorId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "operators", "{{operatorId}}"]
+						},
+						"description": "Update an existing operator (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Operator",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/operators/{{operatorId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "operators", "{{operatorId}}"]
+						},
+						"description": "Delete an operator (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Seed Operators",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"operators\": [\n    {\n      \"code\": \"A\",\n      \"name\": \"Airtel\",\n      \"category\": \"mobile\",\n      \"isActive\": true,\n      \"description\": \"Airtel mobile operator\",\n      \"commission\": 2.5\n    },\n    {\n      \"code\": \"RC\",\n      \"name\": \"RELIANCE - JIO\",\n      \"category\": \"mobile\",\n      \"isActive\": true,\n      \"description\": \"Jio mobile operator\",\n      \"commission\": 2.0\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/seed/operators",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "seed", "operators"]
+						},
+						"description": "Bulk create operators (Admin only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Circle Codes",
+			"item": [
+				{
+					"name": "Get All Circle Codes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/circle-codes?page=1&limit=50",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "circle-codes"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						},
+						"description": "Get all circle codes with pagination and filtering options"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Circle Codes by Region",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/circle-codes/region/north",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "circle-codes", "region", "north"]
+						},
+						"description": "Get circle codes filtered by region (north, south, east, west, central, northeast)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Circle Code by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/circle-codes/{{circleCodeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "circle-codes", "{{circleCodeId}}"]
+						},
+						"description": "Get a specific circle code by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Circle Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"28\",\n  \"name\": \"New State\",\n  \"state\": \"New State\",\n  \"isActive\": true,\n  \"description\": \"New state circle code\",\n  \"region\": \"north\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/circle-codes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "circle-codes"]
+						},
+						"description": "Create a new circle code (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Circle Code",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Updated State Name\",\n  \"state\": \"Updated State\",\n  \"isActive\": true,\n  \"description\": \"Updated description\",\n  \"region\": \"south\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/circle-codes/{{circleCodeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "circle-codes", "{{circleCodeId}}"]
+						},
+						"description": "Update an existing circle code (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Circle Code",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/circle-codes/{{circleCodeId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "circle-codes", "{{circleCodeId}}"]
+						},
+						"description": "Delete a circle code (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Seed Circle Codes",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circleCodes\": [\n    {\n      \"code\": \"1\",\n      \"name\": \"Punjab\",\n      \"state\": \"Punjab\",\n      \"region\": \"north\",\n      \"isActive\": true\n    },\n    {\n      \"code\": \"5\",\n      \"name\": \"Delhi\",\n      \"state\": \"Delhi\",\n      \"region\": \"north\",\n      \"isActive\": true\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/operators/seed/circle-codes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "operators", "seed", "circle-codes"]
+						},
+						"description": "Bulk create circle codes (Admin only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recharge Plans",
+			"item": [
+				{
+					"name": "Get All Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans?page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Get all recharge plans with pagination and filtering options"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plans by Operator and Circle",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/A/5",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "A", "5"]
+						},
+						"description": "Get plans for specific operator (A) and circle (5 - Delhi)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Popular Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/popular?limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "popular"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get popular recharge plans"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Best Seller Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/best-sellers?limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "best-sellers"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get best seller recharge plans"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Special Offers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/special-offers?limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "special-offers"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get special offer plans"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Plans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/search?q=airtel&page=1&limit=20",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "airtel"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						},
+						"description": "Search plans by keyword"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plan by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/{{planId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "{{planId}}"]
+						},
+						"description": "Get a specific plan by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plan by Plan ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/plan-id/AIR_49_28D",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "plan-id", "AIR_49_28D"]
+						},
+						"description": "Get a specific plan by plan ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Plan Statistics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/statistics",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "statistics"]
+						},
+						"description": "Get plan statistics and analytics"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Plan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"planId\": \"AIR_49_28D\",\n  \"operatorCode\": \"A\",\n  \"circleCode\": \"5\",\n  \"planType\": \"prepaid\",\n  \"planCategory\": \"combo\",\n  \"planName\": \"Airtel Rs. 49 Plan\",\n  \"description\": \"28 days validity with unlimited calls and 1GB data per day\",\n  \"validity\": 28,\n  \"validityType\": \"days\",\n  \"amount\": 49,\n  \"talktime\": 0,\n  \"data\": 28,\n  \"dataUnit\": \"GB\",\n  \"sms\": 100,\n  \"features\": [\"Unlimited Calls\", \"1GB Data/Day\", \"100 SMS\", \"28 Days Validity\"],\n  \"benefits\": [\"Free Netflix\", \"Free Amazon Prime\", \"Free Wynk Music\"],\n  \"isPopular\": true,\n  \"isActive\": true,\n  \"commission\": 2.5,\n  \"commissionType\": \"percentage\",\n  \"tags\": [\"airtel\", \"prepaid\", \"combo\", \"popular\"],\n  \"priority\": 10,\n  \"sortOrder\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans"]
+						},
+						"description": "Create a new recharge plan (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Plan",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"planName\": \"Updated Airtel Rs. 49 Plan\",\n  \"description\": \"Updated description with more details\",\n  \"amount\": 55,\n  \"isPopular\": false,\n  \"commission\": 3.0,\n  \"features\": [\"Unlimited Calls\", \"1GB Data/Day\", \"100 SMS\", \"28 Days Validity\", \"New Feature\"],\n  \"benefits\": [\"Free Netflix\", \"Free Amazon Prime\", \"Free Wynk Music\", \"New Benefit\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/{{planId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "{{planId}}"]
+						},
+						"description": "Update an existing recharge plan (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Plan",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/{{planId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "{{planId}}"]
+						},
+						"description": "Delete a recharge plan (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Create Plans",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plans\": [\n    {\n      \"planId\": \"AIR_49_28D\",\n      \"operatorCode\": \"A\",\n      \"circleCode\": \"5\",\n      \"planType\": \"prepaid\",\n      \"planCategory\": \"combo\",\n      \"planName\": \"Airtel Rs. 49 Plan\",\n      \"description\": \"28 days validity with unlimited calls and 1GB data per day\",\n      \"validity\": 28,\n      \"validityType\": \"days\",\n      \"amount\": 49,\n      \"talktime\": 0,\n      \"data\": 28,\n      \"dataUnit\": \"GB\",\n      \"sms\": 100,\n      \"features\": [\"Unlimited Calls\", \"1GB Data/Day\", \"100 SMS\", \"28 Days Validity\"],\n      \"benefits\": [\"Free Netflix\", \"Free Amazon Prime\", \"Free Wynk Music\"],\n      \"isPopular\": true,\n      \"isActive\": true,\n      \"commission\": 2.5,\n      \"commissionType\": \"percentage\",\n      \"tags\": [\"airtel\", \"prepaid\", \"combo\", \"popular\"],\n      \"priority\": 10,\n      \"sortOrder\": 1\n    },\n    {\n      \"planId\": \"JIO_49_28D\",\n      \"operatorCode\": \"RC\",\n      \"circleCode\": \"5\",\n      \"planType\": \"prepaid\",\n      \"planCategory\": \"combo\",\n      \"planName\": \"Jio Rs. 49 Plan\",\n      \"description\": \"28 days validity with unlimited calls and 1GB data per day\",\n      \"validity\": 28,\n      \"validityType\": \"days\",\n      \"amount\": 49,\n      \"talktime\": 0,\n      \"data\": 28,\n      \"dataUnit\": \"GB\",\n      \"sms\": 100,\n      \"features\": [\"Unlimited Calls\", \"1GB Data/Day\", \"100 SMS\", \"28 Days Validity\"],\n      \"benefits\": [\"Free Netflix\", \"Free Amazon Prime\", \"Free JioCinema\", \"Free JioTV\"],\n      \"isPopular\": true,\n      \"isActive\": true,\n      \"commission\": 2.0,\n      \"commissionType\": \"percentage\",\n      \"tags\": [\"jio\", \"prepaid\", \"combo\", \"popular\"],\n      \"priority\": 12,\n      \"sortOrder\": 2\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge-plans/plans/bulk",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge-plans", "plans", "bulk"]
+						},
+						"description": "Bulk create recharge plans (Admin only)"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Legacy Recharge APIs",
+			"item": [
+				{
+					"name": "Get Operators (Legacy)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge/operators",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge", "operators"]
+						},
+						"description": "Legacy endpoint to get operators (now uses database)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Circle Codes (Legacy)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/recharge/circle-codes",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "recharge", "circle-codes"]
+						},
+						"description": "Legacy endpoint to get circle codes (now uses database)"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "your_jwt_token_here",
+			"type": "string"
+		},
+		{
+			"key": "operatorId",
+			"value": "operator_id_here",
+			"type": "string"
+		},
+		{
+			"key": "circleCodeId",
+			"value": "circle_code_id_here",
+			"type": "string"
+		},
+		{
+			"key": "planId",
+			"value": "plan_id_here",
+			"type": "string"
+		}
+	]
+} 

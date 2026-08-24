@@ -1,0 +1,493 @@
+{
+	"info": {
+		"_postman_id": "recharge-api-collection",
+		"name": "Recharge API Collection",
+		"description": "Complete collection for testing Mobile, DTH, Postpaid, and Utility Recharge APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Public Endpoints",
+			"item": [
+				{
+					"name": "Get Operators",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/operators",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"operators"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Circle Codes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/circle-codes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"circle-codes"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/balance?format=json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"balance"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "json"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Recharge Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/status/485668?format=json",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"status",
+								"485668"
+							],
+							"query": [
+								{
+									"key": "format",
+									"value": "json"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Transaction by Order ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/transaction/order/485668",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"transaction",
+								"order",
+								"485668"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Transaction by Transaction ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/transaction/RECHARGE_1234567890_abc123",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"transaction",
+								"RECHARGE_1234567890_abc123"
+							]
+						}
+					}
+				},
+				{
+					"name": "Callback Handler",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/callback?txid=485668&status=Success&opid=RJ0317161622000269New",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"callback"
+							],
+							"query": [
+								{
+									"key": "txid",
+									"value": "485668"
+								},
+								{
+									"key": "status",
+									"value": "Success"
+								},
+								{
+									"key": "opid",
+									"value": "RJ0317161622000269New"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Protected Endpoints",
+			"item": [
+				{
+					"name": "Create Mobile Recharge",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circlecode\": \"2\",\n  \"operatorcode\": \"A\",\n  \"number\": \"980000000\",\n  \"amount\": 10,\n  \"orderid\": \"485668\",\n  \"format\": \"json\",\n  \"callbackUrl\": \"https://your-domain.com/callback\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recharge/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"create"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create DTH Recharge",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circlecode\": \"2\",\n  \"operatorcode\": \"ATV\",\n  \"number\": \"123456789\",\n  \"amount\": 100,\n  \"orderid\": \"485669\",\n  \"format\": \"json\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recharge/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"create"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Electricity Bill Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circlecode\": \"4\",\n  \"operatorcode\": \"MSEDC\",\n  \"number\": \"123456789\",\n  \"amount\": 500,\n  \"orderid\": \"485670\",\n  \"value1\": \"BU001\",\n  \"value2\": \"PC001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recharge/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"create"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Gas Bill Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circlecode\": \"4\",\n  \"operatorcode\": \"MG\",\n  \"number\": \"123456789\",\n  \"amount\": 200,\n  \"orderid\": \"485671\",\n  \"value1\": \"BG001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recharge/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"create"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Insurance Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circlecode\": \"2\",\n  \"operatorcode\": \"ICP\",\n  \"number\": \"POL123456789\",\n  \"amount\": 1000,\n  \"orderid\": \"485672\",\n  \"value1\": \"15-01-1990\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recharge/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"create"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Landline Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"circlecode\": \"5\",\n  \"operatorcode\": \"LAT\",\n  \"number\": \"12345678\",\n  \"amount\": 150,\n  \"orderid\": \"485673\",\n  \"value1\": \"011\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/recharge/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"create"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/transactions?page=1&limit=10&status=SUCCESS",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "SUCCESS"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin Endpoints",
+			"item": [
+				{
+					"name": "Get All Transactions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/admin/transactions?page=1&limit=10&status=SUCCESS",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"admin",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "SUCCESS"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Statistics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{jwt_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/recharge/admin/statistics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"recharge",
+								"admin",
+								"statistics"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "your_jwt_token_here",
+			"type": "string"
+		}
+	]
+} 

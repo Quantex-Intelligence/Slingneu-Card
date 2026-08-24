@@ -1,0 +1,307 @@
+import Api from "@/config/Api";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSelector } from "react-redux";
+
+const { width } = Dimensions.get("window");
+
+interface Coupon {
+  _id: string;
+  title: string;
+  description: string;
+  couponCode: string;
+  image: string;
+  imagePublicId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  link: string;
+}
+
+export default function OfferDetail() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const offerId = params.id as string;
+  const { token } = useSelector((state: any) => state.auth);
+
+  const [offer, setOffer] = useState<Coupon | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showCoupon, setShowCoupon] = React.useState(false);
+
+  useEffect(() => {
+    fetchOfferDetails();
+  }, [offerId]);
+
+  const fetchOfferDetails = async () => {
+    try {
+      setLoading(true);
+      const response = await Api.call(
+        `/api/coupons/search?page=1&limit=10`,
+        "GET",
+        {},
+        token
+      );
+
+      if (response.status === 200) {
+        const coupons = response.data.coupons || [];
+        const foundOffer = coupons.find((coupon: Coupon) => coupon._id === offerId);
+
+        if (foundOffer) {
+          setOffer(foundOffer);
+        } else {
+          Alert.alert("Error", "Offer not found");
+          router.back();
+        }
+      } else {
+        Alert.alert("Error", "Failed to fetch offer details");
+        router.back();
+      }
+    } catch (error) {
+      console.error("Error fetching offer details:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+      router.back();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <LinearGradient
+          colors={["#6c56f9", "#8b5cf6", "#a855f7"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.headerContainer}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => router.back()}>
+              <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Exclusive Deals</Text>
+            <View style={{ width: 28 }} />
+          </View>
+        </LinearGradient>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#6c56f9" />
+          <Text style={styles.loadingText}>Loading offer details...</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (!offer) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: '#1e293b', fontSize: 18, marginTop: 40 }}>Offer not found.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <LinearGradient
+        colors={["#6c56f9", "#8b5cf6", "#a855f7"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerContainer}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Exclusive Deals</Text>
+          <View style={{ width: 28 }} />
+        </View>
+      </LinearGradient>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.brandRow}>
+          <View style={styles.brandImageWrapper}>
+            <Image
+              source={{ uri: offer.image }}
+              style={styles.brandImage}
+              resizeMode="cover"
+              defaultSource={require("../assets/images/cardBg.jpeg")}
+            />
+          </View>
+          <View style={styles.brandInfo}>
+            <Text style={styles.brandName}>{offer.title}</Text>
+            <Text style={styles.brandTitle}>{offer.description}</Text>
+          </View>
+        </View>
+        <Text style={styles.sectionLabel}>COUPON CODE</Text>
+        <View style={styles.couponRow}>
+          <View style={styles.couponBox}>
+            <Text style={styles.couponText}>{showCoupon ? offer.couponCode : '••••'}</Text>
+            <TouchableOpacity onPress={() => setShowCoupon((v: any) => !v)}>
+              <Text style={styles.couponShow}>{showCoupon ? 'Hide' : 'Show'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Text style={styles.sectionLabel}>Brand Description</Text>
+        <Text style={styles.brandDescription}>{offer.description}</Text>
+        <Text style={styles.sectionLabel}>Terms and Conditions</Text>
+        <Text style={styles.termsText}>• Valid on select styles only</Text>
+        <Text style={styles.termsText}>• Cannot be clubbed with any other offer</Text>
+        <Text style={styles.termsText}>• Offer valid until stock lasts</Text>
+        <TouchableOpacity onPress={() => {
+          router.push({
+            pathname: "/webview",
+            params: {
+              url: offer.link,
+              title: offer.title,
+            },
+          });
+        }} style={styles.shopNowButton}>
+          <Text style={styles.shopNowText}>Shop Now</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f8fafc",
+  },
+  headerContainer: {
+    paddingTop: 10,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: "#64748b",
+    textAlign: "center",
+  },
+  scrollContent: {
+    padding: 20,
+    gap: 18,
+  },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+  brandImageWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#e2e8f0",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+    overflow: "hidden",
+  },
+  brandImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+  },
+  brandInfo: {
+    flex: 1,
+  },
+  brandName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#6c56f9",
+    marginBottom: 2,
+  },
+  brandTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1e293b",
+    marginBottom: 2,
+  },
+  sectionLabel: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#1e293b",
+    marginTop: 18,
+    marginBottom: 6,
+  },
+  couponRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  couponBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    shadowColor: "#6c56f9",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+    marginBottom: 8,
+  },
+  couponText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    letterSpacing: 2,
+    color: "#1e293b",
+    marginRight: 18,
+  },
+  couponShow: {
+    color: "#6c56f9",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+  brandDescription: {
+    fontSize: 14,
+    color: "#64748b",
+    marginBottom: 8,
+  },
+  termsText: {
+    fontSize: 13,
+    color: "#64748b",
+    marginBottom: 2,
+  },
+  shopNowButton: {
+    marginTop: 28,
+    backgroundColor: "#d1d5db",
+    borderRadius: 12,
+    alignItems: "center",
+    paddingVertical: 16,
+  },
+  shopNowText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#1e293b",
+  },
+}); 

@@ -1,0 +1,93 @@
+SMS ROUTE MAPPING - WEBHOOK TO SMS TEMPLATES
+================================================
+
+1. CARD ACTIVATION (₹0 - No Money)
+   Route: customer_registered / ACCOUNT_CREATION
+   SMS Template: 1207175640286853908
+   Message: "Congratulations [Customer Name]! Your SlingNeo Prepaid Card - Issued by Transcorp ending [XXXX] has been activated. Happy Spending! - Team Payvoy India Private Limited"
+   Variables: var=customerName, var2=cardEnding
+
+2. POS TRANSACTION (₹[Amount] - Money Spent)
+   Route: POS/ATM/ECOM (DEBIT transactions only)
+   SMS Template: 1207175640002678858
+   Message: "Rs.[Amount] spent on SlingNeo Prepaid Card - Issued by Transcorp at [Merchant]. Available Balance is Rs.[Balance]. Not You? Call on 7597182222 - Team Payvoy India Private Limited"
+   Variables: var=amount, var2=merchantName, var3=balance
+   Example: "Rs.500 spent on SlingNeo Prepaid Card at Amazon. Available Balance is Rs.2500. Not You? Call on 7597182222"
+
+3. TRANSACTION REVERSAL (₹[Amount] - Money Returned)
+   Route: POS_REVERSAL/ATM_REVERSAL/ECOM_REVERSAL
+   SMS Template: 1207175640871398435
+   Message: "Reversal of Rs.[Amount] is credited to SlingNeo Prepaid Card - Issued by Transcorp ending [XXXX] for unsuccessful transaction. Available Balance is Rs.[Balance]. Not You? Call on 7597182222 - Team Payvoy India Private Limited"
+   Variables: var=amount, var2=cardEnding, var3=balance
+   Example: "Reversal of Rs.500 is credited to SlingNeo Prepaid Card ending 1234. Available Balance is Rs.3000"
+
+4. MONEY RECEIVED (₹[Amount] - Money Added)
+   Route: M2C (Money to Card)
+   SMS Template: 1207176939178335430
+   Message: "Your SlingNeo Prepaid Card - Issued by Transcorp balance has been successfully topped up by Rs.[Amount]. Your available Balance is Rs.[Balance]. Not You? Call on 7597182222 - Team Payvoy India Private Limited"
+   Variables: var=amount, var3=balance
+   Example: "Your SlingNeo Prepaid Card balance has been successfully topped up by Rs.1000. Your available Balance is Rs.4000"
+
+5. CARD UNBLOCKED (₹0 - No Money)
+   Route: customer_cardstatus_update (unblock)
+   SMS Template: 1207175649631108322
+   Message: "As per your request your Slingneo Prepaid Card-Transcorp Card ending [XXXX] has been Unblocked. - Team Payvoy India Private Limited"
+   Variables: var=cardEnding
+   Example: "As per your request your Slingneo Prepaid Card-Transcorp Card ending 1234 has been Unblocked"
+
+6. INVALID PIN (₹[Amount] - Transaction Failed)
+   Route: INVALID_PIN
+   SMS Template: 1207175620327710861
+   Message: "Your transaction of Rs.[Amount] on your SlingNeo Prepaid Card - Issued by Transcorp [XXXX] was declined due to invalid PIN. Not you? Please call on 7597182222 - Team Payvoy India Private Limited"
+   Variables: var=amount, var2=cardEnding
+   Example: "Your transaction of Rs.500 on your SlingNeo Prepaid Card 1234 was declined due to invalid PIN"
+
+7. PIN ATTEMPT EXCEEDED (₹0 - No Money)
+   Route: PIN_ATTEMPT_EXCEEDED
+   SMS Template: 1207175640835012463
+   Message: "You have exceeded the maximum attempts with incorrect PIN on your SlingNeo Prepaid Card - Issued by Transcorp ending [XXXX]. For your safety, your card is temporarily blocked. Login to our SlingNeo app to unblock your card. - Team Payvoy India Private Limited"
+   Variables: var=cardEnding
+   Example: "You have exceeded the maximum attempts with incorrect PIN on your SlingNeo Prepaid Card ending 1234"
+
+8. SECURITY CREDENTIALS FAILED (₹[Amount] - Transaction Failed)
+   Route: SECURITY_CREDENTIALS_FAILED
+   SMS Template: 1207175640625342709
+   Message: "Your transaction of Rs.[Amount] on your SlingNeo Prepaid Card - Issued by Transcorp ending [XXXX] was declined due to invalid security credentials. If Not you? Please call on 7597182222 - Team Payvoy India Private Limited"
+   Variables: var=amount, var2=cardEnding
+   Example: "Your transaction of Rs.500 on your SlingNeo Prepaid Card ending 1234 was declined due to invalid security credentials"
+
+9. TRANSACTION OTP (₹[Amount] - OTP for Transaction)
+   Route: transaction_otp
+   SMS Template: 1207175611122558480
+   Message: "[OTP] is OTP for your transaction on SlingNeo Prepaid Card - Issued by Transcorp for INR [Amount]. Do not share the OTP with anyone. Not You?, Call on 7597182222 - Team Payvoy India Private Limited"
+   Variables: var=otp, var2=amount
+   Example: "123456 is OTP for your transaction on SlingNeo Prepaid Card for INR 500. Do not share the OTP with anyone"
+
+10. REGISTRATION OTP (₹0 - No Money)
+    Route: Registration/KYC
+    SMS Template: 68ad564ed9f9ba7fe94e8175
+    Message: "[OTP] is your SlingNeo Prepaid Card - Issued by Transcorp OTP. Don't share the OTP with anyone. - Team Payvoy India Private Limited"
+    Variables: var=otp
+    Example: "123456 is your SlingNeo Prepaid Card OTP. Don't share the OTP with anyone"
+
+11. CARD CLOSURE REMINDER (₹[Balance] - Money Expiring)
+    Route: Card closure reminder
+    SMS Template: 1207175645620547802
+    Message: "Dear [Customer Name], your SlingNeo Prepaid Card - Issued by Transcorp balance of Rs.[Balance] is expiring soon. Utilize before [Expiry Date]. - Team Payvoy India Private Limited"
+    Variables: var=customerName, var2=balance, var3=expiryDate
+    Example: "Dear John, your SlingNeo Prepaid Card balance of Rs.1000 is expiring soon. Utilize before 31-12-2024"
+
+12. CARD CLOSURE CONFIRMATION (₹0 - No Money)
+    Route: Card closure
+    SMS Template: 68b52c97d673ed749d035f23
+    Message: "Dear [Customer Name], your SlingNeo Prepaid Card - Issued by Transcorp is closed. Refund of remaining amount requires verification. Contact us on 7597182222 or email cards@transcorpint.com - Team Payvoy India Private Limited"
+    Variables: var=customerName
+    Example: "Dear John, your SlingNeo Prepaid Card is closed. Refund of remaining amount requires verification"
+
+================================================
+MONEY INVOLVEMENT SUMMARY:
+- ₹0 (No Money): Card activation, unblock, PIN attempts, registration OTP, card closure
+- ₹[Amount] (Money Spent): POS transactions, transaction reversals, money received, invalid PIN, security failures, transaction OTP
+- ₹[Balance] (Account Balance): Balance updates, closure reminders
+
+================================================
