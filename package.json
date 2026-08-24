@@ -1,9 +1,0 @@
-{
-  "name": "sling-monorepo",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "build": "cd sling-app-expo-main/sling-app-expo-main && npm install && npx expo export -p web",
-    "vercel-build": "cd sling-app-expo-main/sling-app-expo-main && npm install && npx expo export -p web"
-  }
-}
