@@ -52,6 +52,7 @@ app.use(express.urlencoded({ extended: true }));
 // Health check routes
 app.get('/', (req, res) => res.json({ status: 'ok', message: 'Sling Backend API Service is running' }));
 app.get('/api', (req, res) => res.json({ status: 'ok', message: 'Sling Backend API' }));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'Sling Backend API is healthy' }));
 
 // Routes
 app.use('/api/slingneo', tcsligneoRoutes);
