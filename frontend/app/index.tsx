@@ -1,15 +1,12 @@
 import { useRouter } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Animated,
   Dimensions,
-  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ViewToken
 } from "react-native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
@@ -54,45 +51,8 @@ const onboardingData: OnboardingItem[] = [
 
 const Onboarding = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollX = useRef(new Animated.Value(0)).current;
-  const slidesRef = useRef<FlatList<OnboardingItem>>(null);
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.auth);
-  const viewableItemsChanged = useRef(
-    ({ viewableItems }: { viewableItems: ViewToken[] }) => {
-      setCurrentIndex(viewableItems[0]?.index ?? 0);
-    }
-  ).current;
-
-  const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
-
-  const scrollTo = () => {
-    if (currentIndex < onboardingData.length - 1) {
-      const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
-      try {
-        slidesRef.current?.scrollToOffset({
-          offset: nextIndex * width,
-          animated: true,
-        });
-      } catch (err) {
-        try {
-          slidesRef.current?.scrollToIndex({
-            index: nextIndex,
-            animated: true,
-          });
-        } catch (err2) {
-          console.log("Scroll fallback notice:", err2);
-        }
-      }
-    } else {
-      router.replace("/login" as any);
-    }
-  };
-
-  const handleSkip = () => {
-    router.replace("/login" as any);
-  };
 
   useEffect(() => {
     if (!user) {
@@ -104,111 +64,69 @@ const Onboarding = () => {
     }
   }, [user]);
 
-  const renderItem = ({ item }: { item: OnboardingItem }) => {
-    return (
+  const handleNext = () => {
+    if (currentIndex < onboardingData.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      router.replace("/login" as any);
+    }
+  };
+
+  const handleSkip = () => {
+    router.replace("/login" as any);
+  };
+
+  const currentItem = onboardingData[currentIndex];
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.skipContainer}>
+        <TouchableOpacity onPress={handleSkip} activeOpacity={0.7}>
+          <Text style={styles.skipText}>Skip</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.slide}>
-        <Image source={item.image} style={styles.image} resizeMode="contain" />
+        <Image
+          source={currentItem.image}
+          style={styles.image}
+          resizeMode="contain"
+        />
         <View style={styles.textContainer}>
-          <Text style={[styles.title, { color: "#000" }]}>{item.title}</Text>
-          {item.description.map((text: string, index: number) => (
-            <Text key={index} style={[styles.description, { color: "#666" }]}>
+          <Text style={styles.title}>{currentItem.title}</Text>
+          {currentItem.description.map((text: string, index: number) => (
+            <Text key={index} style={styles.description}>
               {text}
             </Text>
           ))}
         </View>
       </View>
-    );
-  };
 
-  const Paginator = () => {
-    return (
       <View style={styles.paginationContainer}>
-        {onboardingData.map((_, index) => {
-          const inputRange = [
-            (index - 1) * width,
-            index * width,
-            (index + 1) * width,
-          ];
-
-          const dotWidth = scrollX.interpolate({
-            inputRange,
-            outputRange: [10, 20, 10],
-            extrapolate: "clamp",
-          });
-
-          const opacity = scrollX.interpolate({
-            inputRange,
-            outputRange: [0.3, 1, 0.3],
-            extrapolate: "clamp",
-          });
-
-          return (
-            <Animated.View
+        {onboardingData.map((_, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => setCurrentIndex(index)}
+            activeOpacity={0.8}
+          >
+            <View
               style={[
                 styles.dot,
                 {
-                  width: dotWidth,
-                  opacity,
-                  backgroundColor: "#000",
+                  width: currentIndex === index ? 24 : 10,
+                  backgroundColor: currentIndex === index ? "#6c56f9" : "#D1D5DB",
                 },
               ]}
-              key={index}
             />
-          );
-        })}
-      </View>
-    );
-  };
-
-  return (
-    <View style={[styles.container]}>
-      <View style={styles.skipContainer}>
-        <TouchableOpacity
-          onPress={handleSkip}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.skipText, { color: "#000" }]}>Skip</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      <FlatList
-        data={onboardingData}
-        renderItem={renderItem}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        pagingEnabled
-        bounces={false}
-        keyExtractor={(item) => item.id}
-        getItemLayout={(_, index) => ({
-          length: width,
-          offset: width * index,
-          index,
-        })}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          {
-            useNativeDriver: false,
-            listener: (event: any) => {
-              const contentOffsetX = event.nativeEvent.contentOffset.x;
-              const newIndex = Math.round(contentOffsetX / width);
-              if (
-                newIndex !== currentIndex &&
-                newIndex >= 0 &&
-                newIndex < onboardingData.length
-              ) {
-                setCurrentIndex(newIndex);
-              }
-            },
-          }
-        )}
-        onViewableItemsChanged={viewableItemsChanged}
-        viewabilityConfig={viewConfig}
-        ref={slidesRef}
-      />
-
-      <Paginator />
-
-      <TouchableOpacity style={styles.button} onPress={scrollTo} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleNext}
+        activeOpacity={0.8}
+      >
         <Image
           source={
             currentIndex === 0
@@ -228,66 +146,80 @@ const Onboarding = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "white",
-  },
-  slide: {
-    width,
-    height: height * 0.7,
-    alignItems: "center",
-    padding: 20,
-  },
-  image: {
-    height: height * 0.45,
-    width: width * 0.8,
-    marginTop: height * 0.05,
-  },
-  textContainer: {
-    alignItems: "center",
-    marginTop: height * 0.02,
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: height * 0.025,
-    marginBottom: height * 0.02,
-  },
-  description: {
-    fontSize: height * 0.016,
-    textAlign: "center",
-    marginBottom: height * 0.01,
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dot: {
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  button: {
-    marginBottom: height * 0.04,
-    marginTop: height * 0.02,
-    zIndex: 9999,
-    elevation: 10,
-  },
-  buttonImage: {
-    height: height * 0.1,
-    width: width * 0.8,
+    paddingVertical: 20,
   },
   skipContainer: {
-    position: "absolute",
-    top: height * 0.05,
-    right: width * 0.05,
+    alignSelf: "flex-end",
+    paddingRight: 24,
+    paddingTop: 16,
     zIndex: 9999,
     elevation: 10,
   },
   skipText: {
-    fontSize: height * 0.02,
+    fontSize: 16,
     fontWeight: "bold",
+    color: "#000000",
+  },
+  slide: {
+    width: "100%",
+    maxWidth: 500,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    flex: 1,
+  },
+  image: {
+    height: 280,
+    width: "100%",
+    maxWidth: 320,
+    marginBottom: 24,
+  },
+  textContainer: {
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 22,
+    color: "#111827",
+    marginBottom: 12,
+    textAlign: "center",
+    fontFamily: "SpaceMono-Regular",
+  },
+  description: {
+    fontSize: 14,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 6,
+    fontFamily: "SpaceMono-Regular",
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 12,
+  },
+  dot: {
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 4,
+  },
+  button: {
+    marginBottom: 20,
+    marginTop: 10,
+    zIndex: 9999,
+    elevation: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonImage: {
+    height: 80,
+    width: 280,
   },
 });
 
