@@ -1,8 +1,9 @@
 {
-  "name": "sling-monorepo",
+  "name": "sling-root",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install && npx expo export -p web"
+    "build:frontend": "cd frontend && npm install && npx expo export -p web",
+    "start:backend": "cd backend && npm install && pm2 restart sling-backend --update-env"
   }
 }
