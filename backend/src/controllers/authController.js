@@ -617,8 +617,8 @@ exports.updateMyFcmToken = async (req, res) => {
   const userId = req.user.userId; // From auth middleware
 
   if (!fcmToken) {
-    return res.status(400).json({
-      message: "FCM token is required.",
+    return res.status(200).json({
+      message: "FCM token not provided, skipped update.",
     });
   }
 

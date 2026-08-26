@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 export default function HelpSupport() {
@@ -62,13 +62,20 @@ export default function HelpSupport() {
           <View style={{ width: 28 }} />
         </View>
       </LinearGradient>
-      <WebView
-        style={{ flex: 1 }}
-        source={{ html: htmlContent }}
-        startInLoadingState={true}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-      />
+      {Platform.OS === "web" ? (
+        <iframe
+          srcDoc={htmlContent}
+          style={{ flex: 1, width: "100%", height: "100%", border: "none" }}
+        />
+      ) : (
+        <WebView
+          style={{ flex: 1 }}
+          source={{ html: htmlContent }}
+          startInLoadingState={true}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+        />
+      )}
     </View>
   );
 }

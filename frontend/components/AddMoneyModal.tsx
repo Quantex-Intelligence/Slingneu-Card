@@ -106,29 +106,35 @@ export default function AddMoneyModal({
   }, [amount]);
 
   useEffect(() => {
-    // Set up payment callback when component mounts
-    CFPaymentGatewayService.setCallback({
-      async onVerify(orderID) {
-        console.log("orderID", orderID, currentAmountRef.current);
-
-        addMoney(orderID);
-      },
-      onError(error, orderID) {
-        /**
-         * Configure Error callback
-         */
-        console.log("Payment error:", error, "for order:", orderID);
-        Alert.alert(
-          "Payment Failed",
-          "Payment was not completed. Please try again.",
-          [{ text: "OK" }]
-        );
-      },
-    });
+    // Set up payment callback when component mounts (native only)
+    if (Platform.OS !== "web") {
+      try {
+        CFPaymentGatewayService.setCallback({
+          async onVerify(orderID) {
+            console.log("orderID", orderID, currentAmountRef.current);
+            addMoney(orderID);
+          },
+          onError(error, orderID) {
+            console.log("Payment error:", error, "for order:", orderID);
+            Alert.alert(
+              "Payment Failed",
+              "Payment was not completed. Please try again.",
+              [{ text: "OK" }]
+            );
+          },
+        });
+      } catch (err) {
+        console.warn("Cashfree SDK not supported on this platform:", err);
+      }
+    }
 
     // Clean up callback when component unmounts
     return () => {
-      CFPaymentGatewayService.removeCallback();
+      if (Platform.OS !== "web") {
+        try {
+          CFPaymentGatewayService.removeCallback();
+        } catch (e) {}
+      }
       // Clean up any playing sound
       if (soundRef.current) {
         soundRef.current.unloadAsync();
@@ -137,9 +143,11 @@ export default function AddMoneyModal({
     };
   }, [onClose]);
 
-  const addMoney = async (orderID: string) => {
+  const addMoney = async (orderID: string, targetAmount?: string) => {
+    const amountToAdd = targetAmount || currentAmountRef.current || "0";
     let body = {
-      amount: currentAmountRef.current || 0,
+      entityId: "TSCSLINGNEO" + user?.phone,
+      amount: amountToAdd,
       businessEntityId: "TSCSLINGNEO" + user?.phone,
       fromEntityId: "TCSLINGNEO",
       businessType: "TSCSLINGNEO" + user?.phone,
@@ -151,28 +159,27 @@ export default function AddMoneyModal({
       externalTransactionId: orderID,
       transactionType: "B2C",
     };
-    console.log(body);
+    console.log("load-wallet body:", body);
     const response = await Api.call(
       "/api/slingneo/load-wallet",
       "POST",
       body,
       token
     );
-    console.log("response", response);
-    console.log(response.data);
+    console.log("load-wallet response:", response);
     if (response.status === 200) {
-      const scratchCardCreated = await createScratchCard(parseFloat(currentAmountRef.current || "0"));
+      const scratchCardCreated = await createScratchCard(parseFloat(amountToAdd));
       setAmount("");
       setIsLoading(false);
       await playSuccessSound();
-            if (!scratchCardCreated) {
+      if (!scratchCardCreated) {
         setShowSuccess(true);
       }
     } else {
+      setIsLoading(false);
       Alert.alert(
         "Payment Failed",
-        "Payment was not completed. Please try again.",
-        [{ text: "OK" }]
+        "Payment was not completed. Please try again."
       );
     }
   };
@@ -282,6 +289,11 @@ export default function AddMoneyModal({
       setOrderId(body.order_id);
       const res = await Api.call("/api/cashfree/orders", "POST", body, token);
       console.log("res",res)
+      if (Platform.OS === "web") {
+        await addMoney(body.order_id, data.amount);
+        return;
+      }
+
       try {
         const session = new CFSession(
           res.data.data.payment_session_id,

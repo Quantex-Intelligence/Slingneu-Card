@@ -1,3 +1,4 @@
+import UserProfileModal from "@/components/UserProfileModal";
 import { logout } from "@/store/slices/authSlice";
 import {
   Feather,
@@ -5,9 +6,12 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import {
   Alert,
   Image,
+  Linking,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -20,21 +24,45 @@ import { useDispatch, useSelector } from "react-redux";
 export default function Profile() {
   const { user } = useSelector((state: any) => state.auth);
   const dispatch = useDispatch();
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const performLogout = () => {
+    dispatch(logout());
+    router.replace("/(auth)/login");
+  };
 
   const onLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Logout",
-        onPress: () => {
-          dispatch(logout());
-          router.replace("/login");
+    if (Platform.OS === "web") {
+      if (typeof window !== "undefined" && window.confirm("Are you sure you want to logout?")) {
+        performLogout();
+      }
+    } else {
+      Alert.alert("Logout", "Are you sure you want to logout?", [
+        {
+          text: "Cancel",
+          style: "cancel",
         },
-      },
-    ]);
+        {
+          text: "Logout",
+          onPress: performLogout,
+        },
+      ]);
+    }
+  };
+
+  const openWebLink = (url: string, title: string) => {
+    if (Platform.OS === "web") {
+      if (typeof window !== "undefined") {
+        window.open(url, "_blank");
+      } else {
+        Linking.openURL(url);
+      }
+    } else {
+      router.push({
+        pathname: "/webview",
+        params: { url, title },
+      });
+    }
   };
 
   return (
@@ -63,7 +91,10 @@ export default function Profile() {
         <View style={styles.optionsSection}>
           <Text style={styles.sectionLabel}>Personal Info</Text>
           <View style={styles.optionsBox}>
-            <TouchableOpacity style={styles.optionRow}>
+            <TouchableOpacity
+              style={styles.optionRow}
+              onPress={() => setShowProfileModal(true)}
+            >
               <View
                 style={[
                   styles.optionIconContainer,
@@ -99,15 +130,7 @@ export default function Profile() {
           <View style={styles.optionsBox}>
             <TouchableOpacity
               style={styles.optionRow}
-              onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://slingneo.in/contact",
-                    title: "Help and Support",
-                  },
-                })
-              }
+              onPress={() => router.push("/help-support")}
             >
               <View
                 style={[
@@ -122,13 +145,10 @@ export default function Profile() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://transcorpint.com/ppi-policies-and-tc/",
-                    title: "Policy and T&C",
-                  },
-                })
+                openWebLink(
+                  "https://transcorpint.com/ppi-policies-and-tc/",
+                  "Policy and T&C"
+                )
               }
               style={styles.optionRow}
             >
@@ -172,13 +192,7 @@ export default function Profile() {
             <TouchableOpacity
               style={styles.socialIcon}
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://www.instagram.com/slingneo",
-                    title: "Instagram",
-                  },
-                })
+                openWebLink("https://www.instagram.com/slingneo", "Instagram")
               }
             >
               <FontAwesome name="instagram" size={32} color="#C13584" />
@@ -187,10 +201,7 @@ export default function Profile() {
             <TouchableOpacity
               style={styles.socialIcon}
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: { url: "https://x.com/slingneo", title: "X" },
-                })
+                openWebLink("https://x.com/slingneo", "X")
               }
             >
               <MaterialCommunityIcons name="twitter" size={32} color="#111" />
@@ -199,13 +210,10 @@ export default function Profile() {
             <TouchableOpacity
               style={styles.socialIcon}
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://www.linkedin.com/company/slingneo",
-                    title: "LinkedIn",
-                  },
-                })
+                openWebLink(
+                  "https://www.linkedin.com/company/slingneo",
+                  "LinkedIn"
+                )
               }
             >
               <FontAwesome name="linkedin" size={32} color="#0077B5" />
@@ -214,13 +222,7 @@ export default function Profile() {
             <TouchableOpacity
               style={styles.socialIcon}
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://www.facebook.com/slingneo",
-                    title: "Facebook",
-                  },
-                })
+                openWebLink("https://www.facebook.com/slingneo", "Facebook")
               }
             >
               <FontAwesome name="facebook" size={32} color="#1877F3" />
@@ -229,10 +231,7 @@ export default function Profile() {
           <View style={styles.linksRow}>
             <TouchableOpacity
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: { url: "https://slingneo.in", title: "Sling" },
-                })
+                openWebLink("https://slingneo.in", "Sling")
               }
             >
               <Text style={styles.footerLink}>www.slingneo.in</Text>
@@ -240,13 +239,10 @@ export default function Profile() {
             <Text style={styles.footerDivider}>|</Text>
             <TouchableOpacity
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://slingneo.in/terms-and-conditions/",
-                    title: "Terms & Conditions",
-                  },
-                })
+                openWebLink(
+                  "https://slingneo.in/terms-and-conditions/",
+                  "Terms & Conditions"
+                )
               }
             >
               <Text style={styles.footerLink}>Terms & Condition</Text>
@@ -254,13 +250,10 @@ export default function Profile() {
             <Text style={styles.footerDivider}>|</Text>
             <TouchableOpacity
               onPress={() =>
-                router.push({
-                  pathname: "/webview",
-                  params: {
-                    url: "https://slingneo.in/privacy-policy-2/",
-                    title: "Privacy Policy",
-                  },
-                })
+                openWebLink(
+                  "https://slingneo.in/privacy-policy-2/",
+                  "Privacy Policy"
+                )
               }
             >
               <Text style={styles.footerLink}>Privacy Policy</Text>
@@ -268,6 +261,13 @@ export default function Profile() {
           </View>
         </View>
       </ScrollView>
+
+      {/* User Profile Detail Modal */}
+      <UserProfileModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        user={user}
+      />
     </SafeAreaView>
   );
 }

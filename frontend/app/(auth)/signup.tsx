@@ -272,7 +272,7 @@ export default function Signup() {
           })
         );
         console.log("🔔 [Signup] Navigating to KYC onboarding");
-        router.replace("/kyc-onboarding");
+        router.replace("/(auth)/kyc-onboarding");
       } else {
         console.log(
           "❌ [Signup] Signup failed with status:",

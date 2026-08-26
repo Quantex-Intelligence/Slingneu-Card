@@ -1,3 +1,6 @@
+import ClaimOfferModal from "@/components/ClaimOfferModal";
+import UseVoucherModal from "@/components/UseVoucherModal";
+import * as Clipboard from "expo-clipboard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef, useState } from "react";
@@ -18,9 +21,61 @@ const { width } = Dimensions.get("window");
 
 const VouchersScreen = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const [hasCampus, setHasCampus] = useState(true); // Set to false to test campus not available state
+  const [hasCampus, setHasCampus] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [selectedClaimOffer, setSelectedClaimOffer] = useState<any>(null);
+  const [showClaimModal, setShowClaimModal] = useState(false);
+  const [selectedUseVoucher, setSelectedUseVoucher] = useState<any>(null);
+  const [showUseVoucherModal, setShowUseVoucherModal] = useState(false);
+  const [myVouchersList, setMyVouchersList] = useState<any[]>([
+    {
+      id: "v1",
+      title: "Campus Store Discount",
+      subtitle: "Valid until Dec 31, 2026",
+      value: "20% OFF",
+      code: "SLINGSTU20",
+      color: ["#6c56f9", "#8b5cf6"],
+      icon: "ticket-percent",
+    },
+    {
+      id: "v2",
+      title: "Canteen Special",
+      subtitle: "Valid until Jan 15, 2027",
+      value: "₹50 OFF",
+      code: "CANTEEN50",
+      color: ["#10b981", "#059669"],
+      icon: "food-fork-drink",
+    },
+  ]);
+
+  const handleClaimOffer = (offer: {
+    title: string;
+    subtitle: string;
+    code: string;
+    discount: string;
+    icon?: string;
+    color?: string[];
+  }) => {
+    setSelectedClaimOffer(offer);
+    setShowClaimModal(true);
+
+    setMyVouchersList((prev) => {
+      if (prev.some((v) => v.code === offer.code)) return prev;
+      return [
+        {
+          id: `v_${Date.now()}`,
+          title: offer.title,
+          subtitle: "Valid until Dec 31, 2026",
+          value: offer.discount,
+          code: offer.code,
+          color: offer.color || ["#6c56f9", "#8b5cf6"],
+          icon: offer.icon || "ticket-percent",
+        },
+        ...prev,
+      ];
+    });
+  };
 
   const tabs = [
     { id: 0, title: "Campus Offers", icon: "school", color: "#6c56f9" },
@@ -175,7 +230,14 @@ const VouchersScreen = () => {
         <TouchableOpacity
           style={styles.featuredClaimButton}
           onPress={() =>
-            Alert.alert("Success", "Campus offer claimed successfully!")
+            handleClaimOffer({
+              title: "Student Store Discount",
+              subtitle: "Get 20% off on all campus store purchases",
+              code: "SLINGSTU20",
+              discount: "20% OFF (Up to ₹1000)",
+              icon: "ticket-percent",
+              color: ["#FF6B6B", "#FF8E53"],
+            })
           }
         >
           <Text style={styles.featuredClaimButtonText}>Claim Now</Text>
@@ -215,7 +277,14 @@ const VouchersScreen = () => {
           <TouchableOpacity
             style={styles.claimButton}
             onPress={() =>
-              Alert.alert("Success", "Offer claimed successfully!")
+              handleClaimOffer({
+                title: "Campus Canteen Special",
+                subtitle: "15% discount on all canteen food items",
+                code: "CANTEEN15",
+                discount: "15% OFF",
+                icon: "food-fork-drink",
+                color: ["#10b981", "#059669"],
+              })
             }
           >
             <LinearGradient
@@ -259,7 +328,14 @@ const VouchersScreen = () => {
           <TouchableOpacity
             style={styles.claimButton}
             onPress={() =>
-              Alert.alert("Success", "Offer claimed successfully!")
+              handleClaimOffer({
+                title: "Library Services Discount",
+                subtitle: "Free printing up to 50 pages at library",
+                code: "PRINTFREE50",
+                discount: "FREE PRINTING (₹100 Value)",
+                icon: "book-open-variant",
+                color: ["#f59e0b", "#d97706"],
+              })
             }
           >
             <LinearGradient
@@ -288,7 +364,7 @@ const VouchersScreen = () => {
         <View style={styles.vouchersHeaderContent}>
           <Text style={styles.vouchersHeaderTitle}>🎫 My Vouchers</Text>
           <Text style={styles.vouchersHeaderSubtitle}>
-            Your active vouchers and discounts
+            Your active vouchers and discounts ({myVouchersList.length})
           </Text>
         </View>
         <View style={styles.vouchersHeaderDecoration}>
@@ -299,93 +375,53 @@ const VouchersScreen = () => {
 
       {/* Active Vouchers */}
       <View style={styles.vouchersContainer}>
-        <LinearGradient
-          colors={["#fff", "#fafafa"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.voucherCard}
-        >
-          <View style={styles.voucherHeader}>
-            <LinearGradient
-              colors={["#6c56f9", "#8b5cf6"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.voucherIconContainer}
-            >
-              <MaterialCommunityIcons
-                name="ticket-percent"
-                size={24}
-                color="#fff"
-              />
-            </LinearGradient>
-            <View style={styles.voucherTextContainer}>
-              <Text style={styles.voucherTitle}>Campus Store Discount</Text>
-              <Text style={styles.voucherSubtitle}>
-                Valid until Dec 31, 2024
-              </Text>
-              <Text style={styles.voucherValue}>20% OFF</Text>
-            </View>
-          </View>
-          <TouchableOpacity
-            style={styles.useVoucherButton}
-            onPress={() =>
-              Alert.alert("Voucher", "Voucher applied successfully!")
-            }
+        {myVouchersList.map((voucher) => (
+          <LinearGradient
+            key={voucher.id}
+            colors={["#fff", "#fafafa"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.voucherCard}
           >
-            <LinearGradient
-              colors={["#6c56f9", "#8b5cf6"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.useVoucherGradient}
-            >
-              <Text style={styles.useVoucherText}>Use Voucher</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </LinearGradient>
-
-        <LinearGradient
-          colors={["#fff", "#fafafa"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.voucherCard}
-        >
-          <View style={styles.voucherHeader}>
-            <LinearGradient
-              colors={["#10b981", "#059669"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.voucherIconContainer}
-            >
-              <MaterialCommunityIcons
-                name="food-fork-drink"
-                size={24}
-                color="#fff"
-              />
-            </LinearGradient>
-            <View style={styles.voucherTextContainer}>
-              <Text style={styles.voucherTitle}>Canteen Special</Text>
-              <Text style={styles.voucherSubtitle}>
-                Valid until Jan 15, 2025
-              </Text>
-              <Text style={styles.voucherValue}>₹50 OFF</Text>
+            <View style={styles.voucherHeader}>
+              <LinearGradient
+                colors={voucher.color || ["#6c56f9", "#8b5cf6"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.voucherIconContainer}
+              >
+                <MaterialCommunityIcons
+                  name={voucher.icon || "ticket-percent"}
+                  size={24}
+                  color="#fff"
+                />
+              </LinearGradient>
+              <View style={styles.voucherTextContainer}>
+                <Text style={styles.voucherTitle}>{voucher.title}</Text>
+                <Text style={styles.voucherSubtitle}>
+                  {voucher.subtitle} • Code: {voucher.code}
+                </Text>
+                <Text style={styles.voucherValue}>{voucher.value}</Text>
+              </View>
             </View>
-          </View>
-          <TouchableOpacity
-            style={styles.useVoucherButton}
-            onPress={() =>
-              Alert.alert("Voucher", "Voucher applied successfully!")
-            }
-          >
-            <LinearGradient
-              colors={["#10b981", "#059669"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.useVoucherGradient}
+            <TouchableOpacity
+              style={styles.useVoucherButton}
+              onPress={() => {
+                setSelectedUseVoucher(voucher);
+                setShowUseVoucherModal(true);
+              }}
             >
-              <Text style={styles.useVoucherText}>Use Voucher</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </LinearGradient>
+              <LinearGradient
+                colors={voucher.color || ["#6c56f9", "#8b5cf6"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.useVoucherGradient}
+              >
+                <Text style={styles.useVoucherText}>Use Voucher</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </LinearGradient>
+        ))}
       </View>
     </Animated.View>
   );
@@ -423,7 +459,12 @@ const VouchersScreen = () => {
           {/* My Campus Section (NEW) */}
           <Text style={styles.myCampusTitle}>My Campus</Text>
           <View style={styles.myCampusCardGrid}>
-            <TouchableOpacity style={styles.myCampusCard}>
+            <TouchableOpacity
+              style={styles.myCampusCard}
+              onPress={() =>
+                Alert.alert("Fee Payment", "No pending fee dues found for this semester.")
+              }
+            >
               <MaterialCommunityIcons
                 name="currency-inr"
                 size={36}
@@ -431,7 +472,12 @@ const VouchersScreen = () => {
               />
               <Text style={styles.myCampusCardText}>Fee{"\n"}Payment</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.myCampusCard}>
+            <TouchableOpacity
+              style={styles.myCampusCard}
+              onPress={() =>
+                Alert.alert("Notice Board", "No new campus notices posted today.")
+              }
+            >
               <MaterialCommunityIcons
                 name="clipboard-alert-outline"
                 size={36}
@@ -439,7 +485,12 @@ const VouchersScreen = () => {
               />
               <Text style={styles.myCampusCardText}>Notice Board</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.myCampusCard}>
+            <TouchableOpacity
+              style={styles.myCampusCard}
+              onPress={() =>
+                Alert.alert("My Attendance", `Current overall attendance: ${campusData.attendance}`)
+              }
+            >
               <MaterialCommunityIcons
                 name="calendar-month-outline"
                 size={36}
@@ -447,7 +498,10 @@ const VouchersScreen = () => {
               />
               <Text style={styles.myCampusCardText}>My{"\n"}Attendance</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.myCampusCard}>
+            <TouchableOpacity
+              style={styles.myCampusCard}
+              onPress={() => setActiveTab(0)}
+            >
               <MaterialCommunityIcons
                 name="silverware-fork-knife"
                 size={36}
@@ -465,7 +519,7 @@ const VouchersScreen = () => {
               end={{ x: 1, y: 1 }}
               style={styles.menuCard}
             >
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => setActiveTab(0)}>
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
                     colors={["#fef3c7", "#fde68a"]}
@@ -489,7 +543,12 @@ const VouchersScreen = () => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() =>
+                  Alert.alert("Attendance", `Overall attendance: ${campusData.attendance}`)
+                }
+              >
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
                     colors={["#dbeafe", "#bfdbfe"]}
@@ -513,7 +572,12 @@ const VouchersScreen = () => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() =>
+                  Alert.alert("Events", `${campusData.events} upcoming campus events scheduled this week.`)
+                }
+              >
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
                     colors={["#f3e8ff", "#e9d5ff"]}
@@ -537,7 +601,12 @@ const VouchersScreen = () => {
                 />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() =>
+                  Alert.alert("Campus Preferences", "Campus preference updated to " + campusData.name)
+                }
+              >
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
                     colors={["#dcfce7", "#bbf7d0"]}
@@ -707,6 +776,21 @@ const VouchersScreen = () => {
       >
         {renderTabContent()}
       </ScrollView>
+
+      {/* Claim Offer Modal */}
+      <ClaimOfferModal
+        visible={showClaimModal}
+        onClose={() => setShowClaimModal(false)}
+        onViewVouchers={() => setActiveTab(1)}
+        offer={selectedClaimOffer}
+      />
+
+      {/* Use Voucher Modal */}
+      <UseVoucherModal
+        visible={showUseVoucherModal}
+        onClose={() => setShowUseVoucherModal(false)}
+        voucher={selectedUseVoucher}
+      />
     </View>
   );
 };

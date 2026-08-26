@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -75,23 +76,31 @@ export default function ViewCardWebView() {
         </View>
       )}
 
-      <WebView
-        source={{ uri: url }}
-        style={styles.webview}
-        onNavigationStateChange={handleNavigationStateChange}
-        onLoadEnd={() => setLoading(false)}
-        startInLoadingState={true}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        allowsBackForwardNavigationGestures={true}
-        userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
-        onError={(syntheticEvent) => {
-          const { nativeEvent } = syntheticEvent;
-          Alert.alert("Error", "Failed to load card details. Please try again.", [
-            { text: "OK", onPress: () => router.back() }
-          ]);
-        }}
-      />
+      {Platform.OS === "web" ? (
+        <iframe
+          src={url}
+          style={{ flex: 1, width: "100%", height: "100%", border: "none" }}
+          onLoad={() => setLoading(false)}
+        />
+      ) : (
+        <WebView
+          source={{ uri: url }}
+          style={styles.webview}
+          onNavigationStateChange={handleNavigationStateChange}
+          onLoadEnd={() => setLoading(false)}
+          startInLoadingState={true}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          allowsBackForwardNavigationGestures={true}
+          userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
+          onError={(syntheticEvent) => {
+            const { nativeEvent } = syntheticEvent;
+            Alert.alert("Error", "Failed to load card details. Please try again.", [
+              { text: "OK", onPress: () => router.back() }
+            ]);
+          }}
+        />
+      )}
     </SafeAreaView>
   );
 }

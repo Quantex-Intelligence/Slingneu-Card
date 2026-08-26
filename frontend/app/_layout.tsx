@@ -1,3 +1,4 @@
+import "../config/CashfreePatch";
 import {
   DarkTheme,
   DefaultTheme,
@@ -17,19 +18,14 @@ import { persistor, RootState, store } from "../store/store";
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { user } = useSelector((state: RootState) => state.auth);
   const { isInitialized } = useFirebaseFCM();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-        {!user ? (
-          <Stack.Screen name="index" />
-        ) : user.isKyc === false ? (
-          <Stack.Screen name="kyc-onboarding" />
-        ) : (
-          <Stack.Screen name="home" />
-        )}
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

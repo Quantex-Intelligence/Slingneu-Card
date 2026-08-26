@@ -7,10 +7,10 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    role:{
-      type:String,
-      enum:["admin","user"],
-      default:"user"
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
     },
     phone: {
       type: String,
@@ -44,6 +44,10 @@ const userSchema = new mongoose.Schema(
       default: null,
       index: true,
     },
+    walletBalance: {
+      type: Number,
+      default: 0,
+    },
     // Referral code fields
     referralCode: {
       type: String,
@@ -52,7 +56,7 @@ const userSchema = new mongoose.Schema(
     },
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       default: null,
     },
     referralCount: {

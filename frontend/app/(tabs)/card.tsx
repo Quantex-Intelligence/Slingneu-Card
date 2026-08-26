@@ -91,7 +91,8 @@ export default function Card() {
     );
 
     if (response.status === 200) {
-      setRecentTransactions(response.data.result.reverse() || []);
+      const transactionsList = Array.isArray(response.data?.result) ? [...response.data.result].reverse() : [];
+      setRecentTransactions(transactionsList);
     }
   };
 

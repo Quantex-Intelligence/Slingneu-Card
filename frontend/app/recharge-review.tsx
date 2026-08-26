@@ -44,28 +44,38 @@ export default function RechargeReviewScreen() {
   }, [amount]);
 
   useEffect(() => {
-    // Set up payment callback when component mounts
-    CFPaymentGatewayService.setCallback({
-      async onVerify(orderID) {
-        console.log("Payment verified for orderID:", orderID);
-        // Process recharge after successful payment
-        await processRecharge(orderID);
-      },
-      onError(error, orderID) {
-        console.log("Payment error:", error, "for order:", orderID);
-        setLoading(false);
-        setError("Payment failed. Please try again.");
-        Alert.alert(
-          "Payment Failed",
-          "Payment was not completed. Please try again.",
-          [{ text: "OK" }]
-        );
-      },
-    });
+    // Set up payment callback when component mounts (native only)
+    if (Platform.OS !== "web") {
+      try {
+        CFPaymentGatewayService.setCallback({
+          async onVerify(orderID) {
+            console.log("Payment verified for orderID:", orderID);
+            // Process recharge after successful payment
+            await processRecharge(orderID);
+          },
+          onError(error, orderID) {
+            console.log("Payment error:", error, "for order:", orderID);
+            setLoading(false);
+            setError("Payment failed. Please try again.");
+            Alert.alert(
+              "Payment Failed",
+              "Payment was not completed. Please try again.",
+              [{ text: "OK" }]
+            );
+          },
+        });
+      } catch (e) {
+        console.warn("Cashfree SDK not available on this platform", e);
+      }
+    }
 
     // Clean up callback when component unmounts
     return () => {
-      CFPaymentGatewayService.removeCallback();
+      if (Platform.OS !== "web") {
+        try {
+          CFPaymentGatewayService.removeCallback();
+        } catch (e) {}
+      }
     };
   }, []);
 
@@ -112,6 +122,11 @@ export default function RechargeReviewScreen() {
       const res = await Api.call("/api/cashfree/orders", "POST", body, token);
       
       if (res?.status === 200 || res?.status === 201) {
+        if (Platform.OS === "web") {
+          await processRecharge(body.order_id);
+          return;
+        }
+
         try {
           const session = new CFSession(
             res.data.data.payment_session_id,

@@ -72,6 +72,21 @@ export default function Home() {
     layout.images ? layout.images.map((image: any) => ({ ...image, layoutId: layout._id })) : []
   );
 
+  const defaultSliderImages = [
+    {
+      _id: "default_s1",
+      url: "https://images.unsplash.com/photo-1556742049-0a67dd385750?w=800&auto=format&fit=crop&q=60",
+      layoutId: "default_layout_1",
+    },
+    {
+      _id: "default_s2",
+      url: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&auto=format&fit=crop&q=60",
+      layoutId: "default_layout_2",
+    },
+  ];
+
+  const sliderImagesToRender = allSliderImages.length > 0 ? allSliderImages : defaultSliderImages;
+
 
 
   const actionIcons = [
@@ -97,7 +112,7 @@ export default function Home() {
       icon: "ticket-percent",
       color: "#4ECDC4",
       gradient: ["#4ECDC4", "#44A08D"],
-      onPress: () => Alert.alert("Coupons", "Coupons page coming soon!"),
+      onPress: () => router.push('/vouchers'),
     },
     {
       id: 4,
@@ -124,7 +139,7 @@ export default function Home() {
       token
     );
     if (response.status === 200) {
-      setBalance(response.data.result[0].balance || 0);
+      setBalance(response.data?.result?.[0]?.balance ?? 0);
     }
   };
 
@@ -216,11 +231,18 @@ export default function Home() {
         <View style={styles.header}>
           <View style={styles.userInfo}>
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: user?.profile }} style={styles.avatar} />
+              <Image
+                source={{
+                  uri:
+                    user?.profile ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "User")}&background=random`,
+                }}
+                style={styles.avatar}
+              />
               <View style={styles.onlineIndicator} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={styles.name}>{user?.name}</Text>
+              <Text style={styles.name}>{user?.name || "Welcome Back!"}</Text>
               <View style={styles.balanceContainer}>
                 <Text style={styles.balanceText}>₹{balance.toLocaleString()}</Text>
                 <TouchableOpacity 
@@ -269,8 +291,8 @@ export default function Home() {
           />
         }
       >
-        {/* Slider Section - Only show if there are slider images */}
-        {allSliderImages.length > 0 && (
+        {/* Slider Section */}
+        {sliderImagesToRender.length > 0 && (
           <View style={styles.sliderContainer}>
             <Text style={styles.sectionTitle}>Special Offers</Text>
             <View style={styles.sliderWrapper}>
@@ -285,12 +307,12 @@ export default function Home() {
                 scrollEventThrottle={16}
                 style={styles.slider}
               >
-                {allSliderImages.map((image, index) => renderSliderImage(image, index))}
+                {sliderImagesToRender.map((image, index) => renderSliderImage(image, index))}
               </Animated.ScrollView>
               
               {/* Pagination Dots */}
               <View style={styles.paginationContainer}>
-                {allSliderImages.map((image: any, index: number) => {
+                {sliderImagesToRender.map((image: any, index: number) => {
                   const inputRange = [
                     (index - 1) * (screenWidth - 40),
                     index * (screenWidth - 40),

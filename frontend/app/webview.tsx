@@ -3,6 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -49,12 +50,20 @@ export default function WebViewScreen() {
         }}
       />
       <View style={{ flex: 1 }}>
-        <WebView
-          source={{ uri: url }}
-          onLoadStart={() => setLoading(true)}
-          onLoadEnd={() => setLoading(false)}
-          style={{ flex: 1 }}
-        />
+        {Platform.OS === "web" ? (
+          <iframe
+            src={url}
+            style={{ width: "100%", height: "100%", border: "none" }}
+            onLoad={() => setLoading(false)}
+          />
+        ) : (
+          <WebView
+            source={{ uri: url }}
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={() => setLoading(false)}
+            style={{ flex: 1 }}
+          />
+        )}
         {loading && (
           <View style={styles.loader}>
             <ActivityIndicator size="large" color="#667eea" />

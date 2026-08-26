@@ -4,11 +4,13 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
+import * as Clipboard from "expo-clipboard";
 import {
   Alert,
   Animated,
   Dimensions,
   Image,
+  Platform,
   RefreshControl,
   ScrollView,
   Share,
@@ -53,7 +55,7 @@ const RewardsScreen = () => {
       ]);
 
       if (cashbackResponse.status === 200) {
-        setCashbackOffers(cashbackResponse.data.cashbacks);
+        setCashbackOffers(cashbackResponse.data?.cashbacks || []);
       }
 
       if (scratchCardsResponse?.status === 200) {
@@ -204,7 +206,7 @@ const RewardsScreen = () => {
                       <View key={condition._id} style={styles.cashbackItem}>
                         <View style={styles.cashbackHeader}>
                           <Text style={styles.cashbackType}>
-                            {condition.type.replace('_', ' ').toUpperCase()}
+                            {condition.type?.replace('_', ' ').toUpperCase() || 'CASHBACK'}
                           </Text>
                           <View style={styles.cashbackAmountContainer}>
                             <Text style={styles.cashbackPercentage}>
@@ -256,8 +258,7 @@ const RewardsScreen = () => {
             <Text style={styles.noOffersSubtitle}>
               Check back later for exciting cashback offers!
             </Text>
-            <TouchableOpacity style={styles.refreshButton}>
-           
+            <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
                 <MaterialCommunityIcons name="refresh" size={16} color="#fff" />
                 <Text style={styles.refreshButtonText}>Refresh</Text>
             </TouchableOpacity>
@@ -431,9 +432,15 @@ const RewardsScreen = () => {
             <Text style={styles.referralCode}>{user?.referralCode || "SLING123"}</Text>
             <TouchableOpacity
               style={styles.copyButton}
-              onPress={() =>
-                Alert.alert("Copied!", "Referral code copied to clipboard")
-              }
+              onPress={async () => {
+                const code = user?.referralCode || "SLING123";
+                try {
+                  await Clipboard.setStringAsync(code);
+                  Alert.alert("Copied!", "Referral code " + code + " copied to clipboard.");
+                } catch (e) {
+                  Alert.alert("Copied!", "Referral code: " + code);
+                }
+              }}
             >
               <LinearGradient
                 colors={["#6c56f9", "#8b5cf6"]}
@@ -454,10 +461,23 @@ const RewardsScreen = () => {
 
         <TouchableOpacity
           style={styles.shareButton}
-          onPress={() => Share.share({
-            message: "Check out my referral code: " + user?.referralCode,
-            url: "https://your-app-url.com/referral/" + user?.referralCode,
-          })}
+          onPress={async () => {
+            const code = user?.referralCode || "SLING123";
+            const message = "Use my referral code " + code + " to get ₹100 on Sling!";
+            if (Platform.OS === "web" && typeof navigator !== "undefined" && navigator.share) {
+              try {
+                await navigator.share({ title: "Sling Referral", text: message });
+              } catch (e) {
+                await Clipboard.setStringAsync(code);
+                Alert.alert("Copied!", "Referral code copied to clipboard.");
+              }
+            } else if (Platform.OS === "web") {
+              await Clipboard.setStringAsync(code);
+              Alert.alert("Copied!", "Referral code copied to clipboard: " + code);
+            } else {
+              Share.share({ message });
+            }
+          }}
         >
           <LinearGradient
             colors={["#10b981", "#059669"]}

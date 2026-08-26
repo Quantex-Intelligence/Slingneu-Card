@@ -143,12 +143,12 @@ export default function Login() {
           console.log(
             "🔥 [Login] User needs KYC, navigating to KYC onboarding"
           );
-          router.replace("/kyc-onboarding");
+          router.replace("/(auth)/kyc-onboarding");
         } else {
           console.log(
             "🔥 [Login] User KYC complete, navigating to home"
           );
-          router.replace("/home");
+          router.replace("/(tabs)/home");
         }
       } else {
         Alert.alert("Error", response.data?.message || response.error?.response?.data?.message || "Invalid OTP");

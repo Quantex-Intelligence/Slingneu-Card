@@ -75,7 +75,7 @@ export default function Transactions() {
       );
 
       if (response.status === 200) {
-        const newTransactions = response.data.result || [];
+        const newTransactions = Array.isArray(response.data?.result) ? response.data.result : [];
         if (reset) {
           setTransactions(newTransactions);
           setPageNumber(0);
