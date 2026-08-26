@@ -1,30 +1,25 @@
 const fs = require('fs');
 const path = require('path');
 
-const filesToPatch = [
-  path.join(__dirname, '../node_modules/react-native-cashfree-pg-sdk/lib/commonjs/index.js'),
-  path.join(__dirname, '../node_modules/react-native-cashfree-pg-sdk/lib/module/index.js')
-];
+const targetDir = path.join(__dirname, '../node_modules/react-native-cashfree-pg-sdk');
 
-filesToPatch.forEach(file => {
-  try {
-    if (fs.existsSync(file)) {
-      let content = fs.readFileSync(file, 'utf8');
-      let patched = false;
-      if (content.includes("require('../package.json')")) {
-        content = content.replace(/require\(['"]\.\.\/package\.json['"]\)/g, "require('../../package.json')");
-        patched = true;
-      }
-      if (content.includes("from '../package.json'")) {
-        content = content.replace(/from ['"]\.\.\/package\.json['"]/g, "from '../../package.json'");
-        patched = true;
-      }
-      if (patched) {
-        fs.writeFileSync(file, content, 'utf8');
-        console.log(`✅ Patched cashfree SDK in ${file}`);
+function replaceInDir(dir) {
+  if (!fs.existsSync(dir)) return;
+  const files = fs.readdirSync(dir);
+  for (const file of files) {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
+    if (stat.isDirectory()) {
+      replaceInDir(fullPath);
+    } else if (file.endsWith('.js')) {
+      let content = fs.readFileSync(fullPath, 'utf8');
+      if (content.includes('../package.json')) {
+        content = content.split('../package.json').join('../../package.json');
+        fs.writeFileSync(fullPath, content, 'utf8');
+        console.log(`✅ Patched ${path.relative(targetDir, fullPath)}`);
       }
     }
-  } catch (err) {
-    console.warn(`Warning patching ${file}:`, err.message);
   }
-});
+}
+
+replaceInDir(targetDir);
