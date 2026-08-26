@@ -68,10 +68,30 @@ const Onboarding = () => {
 
   const scrollTo = () => {
     if (currentIndex < onboardingData.length - 1) {
-      slidesRef.current?.scrollToIndex({ index: currentIndex + 1 });
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      try {
+        slidesRef.current?.scrollToOffset({
+          offset: nextIndex * width,
+          animated: true,
+        });
+      } catch (err) {
+        try {
+          slidesRef.current?.scrollToIndex({
+            index: nextIndex,
+            animated: true,
+          });
+        } catch (err2) {
+          console.log("Scroll fallback notice:", err2);
+        }
+      }
     } else {
       router.replace("/login" as any);
     }
+  };
+
+  const handleSkip = () => {
+    router.replace("/login" as any);
   };
 
   useEffect(() => {
@@ -144,7 +164,7 @@ const Onboarding = () => {
     <View style={[styles.container]}>
       <View style={styles.skipContainer}>
         <TouchableOpacity
-          onPress={() => router.replace("/login" as any)}
+          onPress={handleSkip}
           activeOpacity={0.7}
         >
           <Text style={[styles.skipText, { color: "#000" }]}>Skip</Text>
@@ -159,10 +179,26 @@ const Onboarding = () => {
         pagingEnabled
         bounces={false}
         keyExtractor={(item) => item.id}
+        getItemLayout={(_, index) => ({
+          length: width,
+          offset: width * index,
+          index,
+        })}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
           {
             useNativeDriver: false,
+            listener: (event: any) => {
+              const contentOffsetX = event.nativeEvent.contentOffset.x;
+              const newIndex = Math.round(contentOffsetX / width);
+              if (
+                newIndex !== currentIndex &&
+                newIndex >= 0 &&
+                newIndex < onboardingData.length
+              ) {
+                setCurrentIndex(newIndex);
+              }
+            },
           }
         )}
         onViewableItemsChanged={viewableItemsChanged}
