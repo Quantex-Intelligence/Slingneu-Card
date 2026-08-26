@@ -10,10 +10,28 @@ const app = express();
 
 const entity = "TCSLINGNEO";
 
-const m2p_pubkey = fs.readFileSync(
-  path.join("./keys/", "m2psolutions_pub.cer")
-);
-const hp_pvt_key = fs.readFileSync(path.join("./keys/", "slingneo.p8"));
+let m2p_pubkey = Buffer.from("");
+let hp_pvt_key = Buffer.from("");
+
+try {
+  const keysDir = path.join(__dirname, "../../keys");
+  const pubPath = path.join(keysDir, "m2psolutions_pub.cer");
+  const pvtPath = path.join(keysDir, "slingneo.p8");
+
+  if (fs.existsSync(pubPath)) {
+    m2p_pubkey = fs.readFileSync(pubPath);
+  } else if (fs.existsSync("./keys/m2psolutions_pub.cer")) {
+    m2p_pubkey = fs.readFileSync("./keys/m2psolutions_pub.cer");
+  }
+
+  if (fs.existsSync(pvtPath)) {
+    hp_pvt_key = fs.readFileSync(pvtPath);
+  } else if (fs.existsSync("./keys/slingneo.p8")) {
+    hp_pvt_key = fs.readFileSync("./keys/slingneo.p8");
+  }
+} catch (err) {
+  console.warn("⚠️ Encryption key load notice:", err.message);
+}
 
 function generateKey() {
   return crypto.randomBytes(32);

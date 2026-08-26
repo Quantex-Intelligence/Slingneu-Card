@@ -7,8 +7,20 @@ const NodeRSA = require('node-rsa');
 const express = require("express");
 const app = express();
 
- 
-const hp_pvt_key = fs.readFileSync(path.join("./keys/", "slingneo.p8"),'hex');
+let hp_pvt_key = Buffer.from("");
+
+try {
+  const keysDir = path.join(__dirname, "../../keys");
+  const pvtPath = path.join(keysDir, "slingneo.p8");
+
+  if (fs.existsSync(pvtPath)) {
+    hp_pvt_key = fs.readFileSync(pvtPath, "hex");
+  } else if (fs.existsSync("./keys/slingneo.p8")) {
+    hp_pvt_key = fs.readFileSync("./keys/slingneo.p8", "hex");
+  }
+} catch (err) {
+  console.warn("⚠️ Decryption key load notice:", err.message);
+}
 
 
 function decryptData(encryptedData, sessionKey, messageRefNo) {
