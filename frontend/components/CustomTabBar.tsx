@@ -92,11 +92,12 @@ export default CustomTabBar;
 
 const styles = StyleSheet.create({
   tabWrapper: {
-    position: 'absolute',
+    position: Platform.OS === 'web' ? ('fixed' as any) : 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: Platform.OS === 'ios' ? 85 : 75,
+    zIndex: 9999,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
