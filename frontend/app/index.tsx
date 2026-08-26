@@ -70,7 +70,7 @@ const Onboarding = () => {
     if (currentIndex < onboardingData.length - 1) {
       slidesRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      router.replace("/(auth)/login" as any);
+      router.replace("/login" as any);
     }
   };
 
@@ -78,7 +78,7 @@ const Onboarding = () => {
     if (!user) {
       return;
     } else if (user?.isKyc === false) {
-      router.replace("/(auth)/kyc-onboarding" as any);
+      router.replace("/kyc-onboarding" as any);
     } else {
       router.replace("/home" as any);
     }
@@ -144,7 +144,8 @@ const Onboarding = () => {
     <View style={[styles.container]}>
       <View style={styles.skipContainer}>
         <TouchableOpacity
-          onPress={() => router.replace("/(auth)/login" as any)}
+          onPress={() => router.replace("/login" as any)}
+          activeOpacity={0.7}
         >
           <Text style={[styles.skipText, { color: "#000" }]}>Skip</Text>
         </TouchableOpacity>
@@ -171,7 +172,7 @@ const Onboarding = () => {
 
       <Paginator />
 
-      <TouchableOpacity style={styles.button} onPress={scrollTo}>
+      <TouchableOpacity style={styles.button} onPress={scrollTo} activeOpacity={0.8}>
         <Image
           source={
             currentIndex === 0
@@ -197,12 +198,12 @@ const styles = StyleSheet.create({
   },
   slide: {
     width,
-    height,
+    height: height * 0.7,
     alignItems: "center",
     padding: 20,
   },
   image: {
-    height: height * 0.5,
+    height: height * 0.45,
     width: width * 0.8,
     marginTop: height * 0.05,
   },
@@ -232,8 +233,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   button: {
-    marginBottom: height * 0.05,
-    marginTop: height * 0.05,
+    marginBottom: height * 0.04,
+    marginTop: height * 0.02,
+    zIndex: 9999,
+    elevation: 10,
   },
   buttonImage: {
     height: height * 0.1,
@@ -243,7 +246,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: height * 0.05,
     right: width * 0.05,
-    zIndex: 1,
+    zIndex: 9999,
+    elevation: 10,
   },
   skipText: {
     fontSize: height * 0.02,
