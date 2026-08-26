@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Platform,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -429,6 +430,22 @@ export default function Transactions() {
       }
 
       const html = buildHtml(rows);
+
+      if (Platform.OS === "web") {
+        const printWindow = window.open("", "_blank");
+        if (printWindow) {
+          printWindow.document.write(html);
+          printWindow.document.close();
+          printWindow.focus();
+          setTimeout(() => {
+            printWindow.print();
+          }, 250);
+        } else {
+          Alert.alert("Notice", "Please allow popups to download or print statement.");
+        }
+        return;
+      }
+
       const { uri } = await Print.printToFileAsync({
         html,
         base64: false
