@@ -13,8 +13,10 @@ function replaceInDir(dir) {
       replaceInDir(fullPath);
     } else if (file.endsWith('.js')) {
       let content = fs.readFileSync(fullPath, 'utf8');
-      if (content.includes('../package.json')) {
-        content = content.split('../package.json').join('../../package.json');
+      // Idempotent regex matching any number of ../ before package.json inside cashfree SDK
+      const regex = /\.\.\/(\.\.\/)*package\.json/g;
+      if (regex.test(content)) {
+        content = content.replace(regex, '../../package.json');
         fs.writeFileSync(fullPath, content, 'utf8');
         console.log(`✅ Patched ${path.relative(targetDir, fullPath)}`);
       }
