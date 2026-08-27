@@ -107,12 +107,12 @@ export default function Profile() {
             source={{
               uri:
                 user?.profile ||
-                `https://ui-avatars.com/api/?name=${user?.name}&background=random`,
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || "Sling User")}&background=6c56f9&color=ffffff`,
             }}
             style={styles.avatar}
           />
-          <Text style={styles.profileName}>{user?.name}</Text>
-          <Text style={styles.profileUsername}>{user?.phone}</Text>
+          <Text style={styles.profileName}>{user?.name || "Sling User"}</Text>
+          <Text style={styles.profileUsername}>{user?.phone || "+91 83744 77999"}</Text>
         </View>
 
         {/* Wallet Balance Card */}
