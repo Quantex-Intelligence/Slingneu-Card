@@ -127,8 +127,11 @@ export default function RechargeReviewScreen() {
       const res = await Api.call("/api/recharge/create", "POST", body, token);
       if (res?.status === 200 || res?.status === 201) {
         setSuccess(true);
+        setTimeout(() => {
+          router.replace("/recharge-transactions" as any);
+        }, 1500);
       } else {
-        setError("Recharge failed. Please try again.");
+        setError(res?.data?.message || "Recharge failed. Please try again.");
       }
     } catch (e) {
       setError("Recharge failed. Please try again.");
