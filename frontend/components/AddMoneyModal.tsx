@@ -280,31 +280,30 @@ export default function AddMoneyModal({
   };
 
   const handleAddMoney = async (data: { amount: string }) => {
-    console.log("Adding money data:", data);
+    console.log("data",data)
     try {
-      const orderIdStr = `ORD_${Date.now()}`;
-      setOrderId(orderIdStr);
-
+      const body = {
+        order_amount: data.amount,
+        order_id: new Date().getTime().toString(),
+      };
+      setOrderId(body.order_id);
+      const res = await Api.call("/api/cashfree/orders", "POST", body, token);
+      console.log("res",res)
       if (Platform.OS === "web") {
-        await addMoney(orderIdStr, data.amount);
+        await addMoney(body.order_id, data.amount);
         return;
       }
 
       try {
-        const body = {
-          order_amount: data.amount,
-          order_id: orderIdStr,
-        };
-        const res = await Api.call("/api/cashfree/orders", "POST", body, token);
         const session = new CFSession(
-          res?.data?.data?.payment_session_id,
-          res?.data?.data?.order_id || orderIdStr,
+          res.data.data.payment_session_id,
+          res.data.data.order_id,
           CFEnvironment.SANDBOX
         );
         const theme = new CFThemeBuilder()
-          .setNavigationBarBackgroundColor("#6c56f9")
+          .setNavigationBarBackgroundColor("#E64A19")
           .setNavigationBarTextColor("#FFFFFF")
-          .setButtonBackgroundColor("#6c56f9")
+          .setButtonBackgroundColor("#FFC107")
           .setButtonTextColor("#FFFFFF")
           .setPrimaryTextColor("#212121")
           .setSecondaryTextColor("#757575")
@@ -312,12 +311,11 @@ export default function AddMoneyModal({
         const dropPayment = new CFDropCheckoutPayment(session, null, theme);
         CFPaymentGatewayService.doPayment(dropPayment);
       } catch (e: any) {
-        console.log("Cashfree SDK notice, falling back to wallet load:", e);
-        await addMoney(orderIdStr, data.amount);
+        console.log("error", e);
+        Alert.alert("Error", "Failed to initiate payment. Please try again.");
       }
     } catch (error) {
-      console.log("handleAddMoney error, executing fallback:", error);
-      await addMoney(`ORD_${Date.now()}`, data.amount);
+      Alert.alert("Error", "Failed to add money. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -417,20 +415,19 @@ export default function AddMoneyModal({
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  onPress={handleSubmit}
-                  disabled={isLoading}
+                <LinearGradient
+                  colors={["#6c56f9", "#8b5cf6"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
                   style={[
                     styles.submitButton,
                     isLoading && styles.submitButtonDisabled,
                   ]}
-                  activeOpacity={0.8}
                 >
-                  <LinearGradient
-                    colors={["#6c56f9", "#8b5cf6"]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+                  <TouchableOpacity
+                    onPress={handleSubmit}
                     style={styles.submitButtonTouchable}
+                    disabled={isLoading}
                   >
                     {isLoading ? (
                       <>
@@ -451,8 +448,8 @@ export default function AddMoneyModal({
                         <Text style={styles.submitButtonText}>Add Money</Text>
                       </>
                     )}
-                  </LinearGradient>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </LinearGradient>
               </View>
             </ScrollView>
           </View>
@@ -605,7 +602,6 @@ const styles = StyleSheet.create({
   submitButton: {
     flex: 2,
     borderRadius: 16,
-    overflow: "hidden",
     shadowColor: "#6c56f9",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -620,8 +616,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
-    borderRadius: 16,
-    width: "100%",
   },
   submitButtonText: {
     fontSize: 16,

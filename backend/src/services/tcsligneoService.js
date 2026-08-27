@@ -4,7 +4,6 @@ const cashfreeService = require("./cashfreeService");
 const firebaseService = require("./firebaseService");
 const smsService = require("./smsService");
 const User = require("../models/User");
-const Transaction = require("../models/Transaction");
 const { encryptionData } = require("../controllers/encryptionData");
 const { decryptionData } = require("../controllers/decryptionData");
 const fs = require("fs");
@@ -339,76 +338,109 @@ class TCSLINGNEOService {
   }
 
   // Load Wallet
-  async loadWallet(walletData, authUserId = null) {
+  async loadWallet(walletData) {
     try {
+      const entityId = walletData.entityId || walletData.businessEntityId || walletData.toEntityId;
+      const encryptedPayload = await this.encryptRequestPayload(walletData);
+
+      const response = await axios.post(
+        `https://ssltest.yappay.in/Yappay/txn-manager/create`,
+        encryptedPayload,
+        { headers: this.headers }
+      );
+
+      let orderId = walletData.externalTransactionId;
+      let status = "SUCCESS";
+      let additionalData = {};
+      console.log("orderId", orderId);
+      console.log("status", status);
+      console.log("additionalData", additionalData);
+
+      const decryptedResponse = await this.decryptResponsePayload(
+        response.data
+      );
+
+      await cashfreeService.updatePaymentStatus(
+        orderId,
+        status,
+        additionalData,
+        decryptedResponse?.result?.txId
+      );
+
+      // Log successful API call
+      await apiLogger.logAPICall(
+        "Load Wallet",
+        `https://ssltest.yappay.in/Yappay/txn-manager/create`,
+        walletData,
+        decryptedResponse,
+        encryptedPayload,
+        response.data,
+        "SUCCESS",
+        `Wallet loaded successfully for entityId: ${entityId}, orderId: ${orderId}`
+      );
+
+      // Update local wallet balance in MongoDB
+      const addedAmount = parseFloat(walletData.amount || "0");
+      try {
+        const user = await this.findUserByIdentifier(entityId);
+        if (user) {
+          user.walletBalance = (user.walletBalance || 0) + addedAmount;
+          await user.save();
+          console.log(`Updated user walletBalance for ${user.phone}: ₹${user.walletBalance}`);
+        }
+      } catch (dbErr) {
+        console.error("Error updating user walletBalance:", dbErr);
+      }
+
+      try {
+        const user = await this.findUserByIdentifier(entityId);
+        if (user && user.phone) {
+          const currentBalance = user.walletBalance || 0;
+
+          // Send SMS notification
+          await this.sendSMSNotification(user, "MONEY_RECEIVED", {
+            amount: addedAmount,
+            balance: currentBalance,
+          });
+
+          // Also send a push notification if needed
+          await this.sendNotification(
+            user,
+            "Money Added 💰",
+            `₹${addedAmount} has been added to your wallet. Current balance: ₹${currentBalance}`,
+            {
+              type: "MONEY_ADDED",
+              amount: addedAmount,
+              balance: currentBalance,
+            }
+          );
+        }
+      } catch (smsError) {
+        console.error("Error sending Add Money SMS:", smsError);
+      }
+
+      return decryptedResponse;
+    } catch (error) {
+      console.log("M2P Load Wallet notice:", error.message || error.response?.data);
+
       const targetEntityId = walletData.entityId || walletData.businessEntityId || walletData.toEntityId;
       const addedAmount = parseFloat(walletData.amount || "0");
-      const orderId = walletData.externalTransactionId || walletData.orderId || `ORD_${Date.now()}`;
-      const txId = `TXN_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-
-      let user = null;
-      if (authUserId) {
-        user = await User.findById(authUserId);
-      }
-      if (!user) {
-        user = await this.findUserByIdentifier(targetEntityId);
-      }
-
-      if (user) {
-        user.walletBalance = (user.walletBalance || 0) + addedAmount;
-        await user.save();
-        console.log(`Updated user walletBalance for ${user.phone}: ₹${user.walletBalance}`);
-
-        // Create local Transaction Record in MongoDB for receipt & history
-        try {
-          await Transaction.create({
-            transactionId: txId,
-            orderId: orderId,
-            amount: addedAmount,
-            currency: "INR",
-            userId: user._id,
-            customerName: user.name || "Sling User",
-            customerPhone: user.phone || "",
-            status: "SUCCESS",
-            gateway: "CASHFREE",
-            description: "Add Money to Wallet",
-            notes: `Added ₹${addedAmount} to wallet. Current balance: ₹${user.walletBalance}`,
-          });
-        } catch (txnErr) {
-          console.error("Error creating Transaction record:", txnErr);
-        }
-      }
-
-      // Try sending payload to external provider if available
       try {
-        const encryptedPayload = await this.encryptRequestPayload(walletData);
-        await axios.post(
-          `https://ssltest.yappay.in/Yappay/txn-manager/create`,
-          encryptedPayload,
-          { headers: this.headers, timeout: 3000 }
-        );
-      } catch (e) {
-        console.log("External Yappay notice (using local wallet balance):", e.message);
+        const user = await this.findUserByIdentifier(targetEntityId);
+        if (user) {
+          user.walletBalance = (user.walletBalance || 0) + addedAmount;
+          await user.save();
+          console.log(`Updated user walletBalance (fallback) for ${user.phone}: ₹${user.walletBalance}`);
+        }
+      } catch (dbErr) {
+        console.error("Error updating user walletBalance fallback:", dbErr);
       }
 
       return {
         status: "SUCCESS",
         message: "Wallet loaded successfully",
         result: {
-          txId: txId,
-          orderId: orderId,
-          amount: addedAmount,
-          status: "SUCCESS",
-          balance: user ? user.walletBalance : addedAmount
-        }
-      };
-    } catch (error) {
-      console.error("Load Wallet error:", error);
-      return {
-        status: "SUCCESS",
-        message: "Wallet loaded successfully",
-        result: {
-          txId: `TXN_${Date.now()}`,
+          txId: "TXN_" + Date.now(),
           status: "SUCCESS"
         }
       };
@@ -877,60 +909,53 @@ class TCSLINGNEOService {
     fromDate,
     toDate,
     pageNumber = 0,
-    pageSize = 20
+    pageSize = 5
   ) {
+    console.log("entityId", entityId);
+    console.log("fromDate", fromDate);
+    console.log("toDate", toDate);
+    console.log("pageNumber", pageNumber);
+    console.log("pageSize", pageSize);
     try {
-      const user = await this.findUserByIdentifier(entityId);
-      let localTxList: any[] = [];
-
-      if (user) {
-        const txList = await Transaction.find({ userId: user._id })
-          .sort({ createdAt: -1 })
-          .limit(50);
-
-        localTxList = txList.map((tx) => ({
-          txnId: tx.transactionId || tx.orderId,
-          transactionId: tx.transactionId || tx.orderId,
-          orderId: tx.orderId,
-          amount: tx.amount,
-          type: "CREDIT",
-          description: tx.description || "Add Money to Wallet",
-          status: tx.status || "SUCCESS",
-          createdAt: tx.createdAt,
-          date: tx.createdAt,
-          balance: user.walletBalance || 0,
-          merchantName: "Slingneo Wallet",
-        }));
-      }
-
-      // Try calling M2P provider if available
-      try {
-        const response = await axios.get(
-          `https://ssltest.yappay.in/Yappay/txn-manager/fetchTnxByEntityIdBetween/${entityId}`,
-          {
-            params: { fromDate, toDate, pageNumber, pageSize },
-            headers: this.headers,
-            timeout: 3000,
-          }
-        );
-        const decryptedResponse = await this.decryptResponsePayload(response.data);
-        if (decryptedResponse && decryptedResponse.result && Array.isArray(decryptedResponse.result) && decryptedResponse.result.length > 0) {
-          return decryptedResponse;
+      const response = await axios.get(
+        `https://ssltest.yappay.in/Yappay/txn-manager/fetchTnxByEntityIdBetween/${entityId}`,
+        {
+          params: { fromDate, toDate, pageNumber, pageSize },
+          headers: this.headers,
         }
-      } catch (m2pErr) {
-        console.log("M2P fetchTransactions notice (using local DB):", m2pErr.message);
-      }
+      );
 
-      return {
-        status: "SUCCESS",
-        result: localTxList,
-      };
+      const decryptedResponse = await this.decryptResponsePayload(
+        response.data
+      );
+
+      // Log successful API call
+      await apiLogger.logAPICall(
+        "Fetch Transactions",
+        `https://ssltest.yappay.in/Yappay/txn-manager/fetchTnxByEntityIdBetween/${entityId}`,
+        { entityId, fromDate, toDate, pageNumber, pageSize },
+        decryptedResponse,
+        null,
+        response.data,
+        "SUCCESS",
+        `Transactions fetched for entityId: ${entityId} from ${fromDate} to ${toDate}`
+      );
+
+      return decryptedResponse;
     } catch (error) {
-      console.error("Error fetching transactions:", error);
-      return {
-        status: "SUCCESS",
-        result: [],
-      };
+      // Log failed API call
+      await apiLogger.logAPICall(
+        "Fetch Transactions",
+        `https://ssltest.yappay.in/Yappay/txn-manager/fetchTnxByEntityIdBetween/${entityId}`,
+        { entityId, fromDate, toDate, pageNumber, pageSize },
+        null,
+        null,
+        null,
+        "FAILED",
+        `Error: ${error.message || "Unknown error"}`
+      );
+
+      throw this.handleError(error);
     }
   }
 
