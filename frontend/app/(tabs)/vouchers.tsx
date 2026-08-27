@@ -8,6 +8,7 @@ import {
   Alert,
   Animated,
   Dimensions,
+  Modal,
   RefreshControl,
   ScrollView,
   StatusBar,
@@ -16,10 +17,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
 const VouchersScreen = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState(0);
   const [hasCampus, setHasCampus] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -28,6 +31,10 @@ const VouchersScreen = () => {
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [selectedUseVoucher, setSelectedUseVoucher] = useState<any>(null);
   const [showUseVoucherModal, setShowUseVoucherModal] = useState(false);
+  const [showFeeModal, setShowFeeModal] = useState(false);
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [showEventsModal, setShowEventsModal] = useState(false);
   const [myVouchersList, setMyVouchersList] = useState<any[]>([
     {
       id: "v1",
@@ -461,9 +468,7 @@ const VouchersScreen = () => {
           <View style={styles.myCampusCardGrid}>
             <TouchableOpacity
               style={styles.myCampusCard}
-              onPress={() =>
-                Alert.alert("Fee Payment", "No pending fee dues found for this semester.")
-              }
+              onPress={() => setShowFeeModal(true)}
             >
               <MaterialCommunityIcons
                 name="currency-inr"
@@ -474,9 +479,7 @@ const VouchersScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.myCampusCard}
-              onPress={() =>
-                Alert.alert("Notice Board", "No new campus notices posted today.")
-              }
+              onPress={() => setShowNoticeModal(true)}
             >
               <MaterialCommunityIcons
                 name="clipboard-alert-outline"
@@ -487,9 +490,7 @@ const VouchersScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.myCampusCard}
-              onPress={() =>
-                Alert.alert("My Attendance", `Current overall attendance: ${campusData.attendance}`)
-              }
+              onPress={() => setShowAttendanceModal(true)}
             >
               <MaterialCommunityIcons
                 name="calendar-month-outline"
@@ -500,7 +501,7 @@ const VouchersScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.myCampusCard}
-              onPress={() => setActiveTab(0)}
+              onPress={() => router.push("/offer-list")}
             >
               <MaterialCommunityIcons
                 name="silverware-fork-knife"
@@ -519,7 +520,7 @@ const VouchersScreen = () => {
               end={{ x: 1, y: 1 }}
               style={styles.menuCard}
             >
-              <TouchableOpacity style={styles.menuItem} onPress={() => setActiveTab(0)}>
+              <TouchableOpacity style={styles.menuItem} onPress={() => router.push("/offer-list")}>
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
                     colors={["#fef3c7", "#fde68a"]}
@@ -545,9 +546,7 @@ const VouchersScreen = () => {
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() =>
-                  Alert.alert("Attendance", `Overall attendance: ${campusData.attendance}`)
-                }
+                onPress={() => setShowAttendanceModal(true)}
               >
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
@@ -574,9 +573,7 @@ const VouchersScreen = () => {
 
               <TouchableOpacity
                 style={styles.menuItem}
-                onPress={() =>
-                  Alert.alert("Events", `${campusData.events} upcoming campus events scheduled this week.`)
-                }
+                onPress={() => setShowEventsModal(true)}
               >
                 <View style={styles.menuItemLeft}>
                   <LinearGradient
@@ -791,6 +788,129 @@ const VouchersScreen = () => {
         onClose={() => setShowUseVoucherModal(false)}
         voucher={selectedUseVoucher}
       />
+
+      {/* Fee Payment Modal */}
+      <Modal visible={showFeeModal} transparent animationType="slide" onRequestClose={() => setShowFeeModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContentCard}>
+            <LinearGradient colors={["#6c56f9", "#8b5cf6"]} style={styles.modalHeaderGrad}>
+              <Text style={styles.modalHeaderTitle}>🎓 Campus Fee Dues</Text>
+              <TouchableOpacity onPress={() => setShowFeeModal(false)}>
+                <MaterialCommunityIcons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </LinearGradient>
+            <View style={styles.modalInnerBody}>
+              <View style={styles.feeItemRow}>
+                <Text style={styles.feeItemTitle}>Semester 5 Tuition Fee</Text>
+                <Text style={styles.feeItemStatus}>₹0.00 (PAID)</Text>
+              </View>
+              <View style={styles.feeItemRow}>
+                <Text style={styles.feeItemTitle}>Library & Lab Dues</Text>
+                <Text style={styles.feeItemStatus}>₹0.00 (NO DUES)</Text>
+              </View>
+              <View style={styles.feeItemRow}>
+                <Text style={styles.feeItemTitle}>Hostel & Maintenance</Text>
+                <Text style={styles.feeItemStatus}>₹0.00 (PAID)</Text>
+              </View>
+              <TouchableOpacity 
+                style={styles.payFeeActionBtn} 
+                onPress={() => {
+                  setShowFeeModal(false);
+                  router.push("/recharge");
+                }}
+              >
+                <Text style={styles.payFeeActionBtnText}>Pay Utility & Custom Dues ➔</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Notice Board Modal */}
+      <Modal visible={showNoticeModal} transparent animationType="slide" onRequestClose={() => setShowNoticeModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContentCard}>
+            <LinearGradient colors={["#4ECDC4", "#44A08D"]} style={styles.modalHeaderGrad}>
+              <Text style={styles.modalHeaderTitle}>📢 Campus Notice Board</Text>
+              <TouchableOpacity onPress={() => setShowNoticeModal(false)}>
+                <MaterialCommunityIcons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </LinearGradient>
+            <ScrollView style={styles.modalInnerBodyScroll}>
+              <View style={styles.noticeCard}>
+                <Text style={styles.noticeCardBadge}>EXAM NOTICE</Text>
+                <Text style={styles.noticeCardTitle}>End-Semester Examination Date Sheet Released</Text>
+                <Text style={styles.noticeCardBody}>The final date sheet for 5th semester examinations has been published on the DTU student portal. Examinations start next month.</Text>
+                <Text style={styles.noticeCardDate}>Posted Today • DTU Admin</Text>
+              </View>
+              <View style={styles.noticeCard}>
+                <Text style={styles.noticeCardBadge}>FEST ALERT</Text>
+                <Text style={styles.noticeCardTitle}>Annual Cultural Fest Registrations Open</Text>
+                <Text style={styles.noticeCardBody}>Register for music, dance, and drama competitions. Sling Card holders get free VIP entry passes!</Text>
+                <Text style={styles.noticeCardDate}>Posted 1 day ago • Student Council</Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Attendance Modal */}
+      <Modal visible={showAttendanceModal} transparent animationType="slide" onRequestClose={() => setShowAttendanceModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContentCard}>
+            <LinearGradient colors={["#3b82f6", "#2563eb"]} style={styles.modalHeaderGrad}>
+              <Text style={styles.modalHeaderTitle}>📊 Attendance Summary</Text>
+              <TouchableOpacity onPress={() => setShowAttendanceModal(false)}>
+                <MaterialCommunityIcons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </LinearGradient>
+            <View style={styles.modalInnerBody}>
+              <View style={styles.overallAttBox}>
+                <Text style={styles.overallAttScore}>85.5%</Text>
+                <Text style={styles.overallAttLabel}>Overall Attendance • Good Standing</Text>
+              </View>
+              <View style={styles.subjectAttRow}>
+                <Text style={styles.subjectTitle}>Computer Networks</Text>
+                <Text style={styles.subjectScore}>90% (Good)</Text>
+              </View>
+              <View style={styles.subjectAttRow}>
+                <Text style={styles.subjectTitle}>Data Structures & Algo</Text>
+                <Text style={styles.subjectScore}>88% (Good)</Text>
+              </View>
+              <View style={styles.subjectAttRow}>
+                <Text style={styles.subjectTitle}>Operating Systems</Text>
+                <Text style={styles.subjectScore}>82% (Warning)</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Events Modal */}
+      <Modal visible={showEventsModal} transparent animationType="slide" onRequestClose={() => setShowEventsModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContentCard}>
+            <LinearGradient colors={["#a855f7", "#9333ea"]} style={styles.modalHeaderGrad}>
+              <Text style={styles.modalHeaderTitle}>📅 Campus Events</Text>
+              <TouchableOpacity onPress={() => setShowEventsModal(false)}>
+                <MaterialCommunityIcons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </LinearGradient>
+            <ScrollView style={styles.modalInnerBodyScroll}>
+              <View style={styles.noticeCard}>
+                <Text style={styles.noticeCardBadge}>TOMORROW</Text>
+                <Text style={styles.noticeCardTitle}>Sling Campus Hackathon 2026</Text>
+                <Text style={styles.noticeCardBody}>24-hour coding challenge with prizes worth ₹50,000. Venue: DTU Auditorium.</Text>
+              </View>
+              <View style={styles.noticeCard}>
+                <Text style={styles.noticeCardBadge}>THIS FRIDAY</Text>
+                <Text style={styles.noticeCardTitle}>Inter-College Sports Championship</Text>
+                <Text style={styles.noticeCardBody}>Football & Basketball finals starting 10:00 AM at the Main Sports Complex.</Text>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -1436,6 +1556,145 @@ const styles = StyleSheet.create({
     color: "#1e293b",
     textAlign: "center",
     fontFamily: "SpaceMono-Regular",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContentCard: {
+    width: "100%",
+    maxWidth: 500,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  modalHeaderGrad: {
+    padding: 18,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  modalHeaderTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalInnerBody: {
+    padding: 20,
+  },
+  modalInnerBodyScroll: {
+    padding: 20,
+    maxHeight: 400,
+  },
+  feeItemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f5f9",
+  },
+  feeItemTitle: {
+    fontSize: 14,
+    color: "#334155",
+    fontWeight: "500",
+  },
+  feeItemStatus: {
+    fontSize: 14,
+    color: "#10b981",
+    fontWeight: "bold",
+  },
+  payFeeActionBtn: {
+    marginTop: 20,
+    backgroundColor: "#6c56f9",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  payFeeActionBtnText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  noticeCard: {
+    backgroundColor: "#f8fafc",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  noticeCardBadge: {
+    fontSize: 10,
+    fontWeight: "bold",
+    color: "#6c56f9",
+    backgroundColor: "#e0e7ff",
+    alignSelf: "flex-start",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 6,
+  },
+  noticeCardTitle: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: "#1e293b",
+    marginBottom: 6,
+  },
+  noticeCardBody: {
+    fontSize: 13,
+    color: "#64748b",
+    lineHeight: 18,
+    marginBottom: 8,
+  },
+  noticeCardDate: {
+    fontSize: 11,
+    color: "#94a3b8",
+    fontWeight: "500",
+  },
+  overallAttBox: {
+    backgroundColor: "#eff6ff",
+    borderRadius: 16,
+    padding: 20,
+    alignItems: "center",
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#bfdbfe",
+  },
+  overallAttScore: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#2563eb",
+  },
+  overallAttLabel: {
+    fontSize: 13,
+    color: "#3b82f6",
+    fontWeight: "600",
+    marginTop: 4,
+  },
+  subjectAttRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f5f9",
+  },
+  subjectTitle: {
+    fontSize: 14,
+    color: "#334155",
+    fontWeight: "500",
+  },
+  subjectScore: {
+    fontSize: 14,
+    color: "#10b981",
+    fontWeight: "bold",
   },
 });
 
