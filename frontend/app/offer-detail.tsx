@@ -176,42 +176,82 @@ export default function OfferDetail() {
         <View style={styles.brandRow}>
           <View style={styles.brandImageWrapper}>
             <Image
-              source={{ uri: offer.image }}
+              source={{ uri: offer.image || "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500&auto=format&fit=crop&q=60" }}
               style={styles.brandImage}
               resizeMode="cover"
-              defaultSource={require("../assets/images/cardBg.jpeg")}
             />
           </View>
           <View style={styles.brandInfo}>
-            <Text style={styles.brandName}>{offer.title}</Text>
-            <Text style={styles.brandTitle}>{offer.description}</Text>
+            <Text style={styles.brandName}>{offer.title || "Special Offer"}</Text>
+            <Text style={styles.brandTitle}>{offer.description || "Exclusive student discount deal"}</Text>
           </View>
         </View>
+
         <Text style={styles.sectionLabel}>COUPON CODE</Text>
-        <View style={styles.couponRow}>
-          <View style={styles.couponBox}>
-            <Text style={styles.couponText}>{showCoupon ? offer.couponCode : '••••'}</Text>
-            <TouchableOpacity onPress={() => setShowCoupon((v: any) => !v)}>
-              <Text style={styles.couponShow}>{showCoupon ? 'Hide' : 'Show'}</Text>
-            </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.couponBox} 
+          onPress={async () => {
+            setShowCoupon(true);
+            const code = offer.couponCode || "CAMPUS50";
+            try {
+              const Clipboard = require("expo-clipboard");
+              await Clipboard.setStringAsync(code);
+              Alert.alert("Copied!", `Coupon code "${code}" copied to clipboard.`);
+            } catch (e) {
+              Alert.alert("Coupon Code", `Your code is: ${code}`);
+            }
+          }}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.couponText}>
+            {showCoupon ? (offer.couponCode || "CAMPUS50") : '••••••••'}
+          </Text>
+          <View style={styles.copyPill}>
+            <MaterialCommunityIcons name="content-copy" size={14} color="#fff" />
+            <Text style={styles.copyPillText}>{showCoupon ? 'Copy' : 'Show Code'}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
+
         <Text style={styles.sectionLabel}>Brand Description</Text>
-        <Text style={styles.brandDescription}>{offer.description}</Text>
+        <Text style={styles.brandDescription}>{offer.description || "Get exclusive discounts with your Slingneo card."}</Text>
+
         <Text style={styles.sectionLabel}>Terms and Conditions</Text>
-        <Text style={styles.termsText}>• Valid on select styles only</Text>
-        <Text style={styles.termsText}>• Cannot be clubbed with any other offer</Text>
+        <Text style={styles.termsText}>• Valid on select styles & participating outlets</Text>
+        <Text style={styles.termsText}>• Cannot be clubbed with any other active offer</Text>
         <Text style={styles.termsText}>• Offer valid until stock lasts</Text>
-        <TouchableOpacity onPress={() => {
-          router.push({
-            pathname: "/webview",
-            params: {
-              url: offer.link,
-              title: offer.title,
-            },
-          });
-        }} style={styles.shopNowButton}>
-          <Text style={styles.shopNowText}>Shop Now</Text>
+
+        <TouchableOpacity 
+          onPress={async () => {
+            const code = offer.couponCode || "CAMPUS50";
+            try {
+              const Clipboard = require("expo-clipboard");
+              await Clipboard.setStringAsync(code);
+            } catch (e) {}
+
+            if (offer.link && offer.link.startsWith("http")) {
+              router.push({
+                pathname: "/webview",
+                params: {
+                  url: offer.link,
+                  title: offer.title || "Exclusive Offer",
+                },
+              });
+            } else {
+              Alert.alert("Coupon Ready!", `Code "${code}" copied. Use it at checkout!`);
+            }
+          }} 
+          style={styles.shopNowButton}
+          activeOpacity={0.85}
+        >
+          <LinearGradient
+            colors={["#6c56f9", "#8b5cf6"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.shopNowGradient}
+          >
+            <MaterialCommunityIcons name="shopping-outline" size={20} color="#fff" />
+            <Text style={styles.shopNowText}>Shop Now & Redeem</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -304,28 +344,39 @@ const styles = StyleSheet.create({
   couponBox: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderWidth: 1.5,
+    borderColor: "#6c56f9",
     shadowColor: "#6c56f9",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
     marginBottom: 8,
   },
   couponText: {
     fontSize: 20,
     fontWeight: "bold",
     letterSpacing: 2,
-    color: "#1e293b",
-    marginRight: 18,
-  },
-  couponShow: {
     color: "#6c56f9",
+  },
+  copyPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#6c56f9",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 6,
+  },
+  copyPillText: {
+    color: "#fff",
     fontWeight: "bold",
-    fontSize: 15,
+    fontSize: 13,
   },
   brandDescription: {
     fontSize: 14,
@@ -339,14 +390,25 @@ const styles = StyleSheet.create({
   },
   shopNowButton: {
     marginTop: 28,
-    backgroundColor: "#d1d5db",
-    borderRadius: 12,
+    borderRadius: 14,
+    overflow: "hidden",
+    shadowColor: "#6c56f9",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  shopNowGradient: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 16,
+    paddingHorizontal: 24,
+    gap: 10,
   },
   shopNowText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#1e293b",
+    color: "#fff",
   },
 }); 
