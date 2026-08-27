@@ -58,11 +58,12 @@ export default function Login() {
   const handleSendOtp = async () => {
     try {
       setLoading(true);
-      console.log("🔥 [Login] Sending OTP to:", phoneNumber);
+      const cleanPhone = phoneNumber.trim().replace(/\s+/g, "");
+      console.log("🔥 [Login] Sending OTP to:", cleanPhone);
 
       // First check if user exists
       const checkUserResponse = await Api.call("/api/auth/check-user", "POST", {
-        phone: phoneNumber,
+        phone: cleanPhone,
       });
 
       if (checkUserResponse.status === 200 || checkUserResponse.status === 201) {
@@ -77,7 +78,7 @@ export default function Login() {
 
         // If user exists, send OTP via backend API
         const sendOtpResponse = await Api.call("/api/auth/send-otp", "POST", {
-          phone: phoneNumber,
+          phone: cleanPhone,
         });
 
         if (sendOtpResponse.status === 200 || sendOtpResponse.status === 201) {
@@ -105,13 +106,13 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       setLoading(true);
-      console.log("🔥 [Login] Starting login process...");
-      console.log("🔥 [Login] Push token:", fcmToken);
-
+      const cleanPhone = phoneNumber.trim().replace(/\s+/g, "");
+      const cleanOtp = otp.trim();
+      console.log("🔥 [Login] Starting login process for:", cleanPhone);
 
       const loginData = {
-        phone: phoneNumber,
-        otp: otp,
+        phone: cleanPhone,
+        otp: cleanOtp,
         orderId: orderId,
         fcmToken: fcmToken,
       };
