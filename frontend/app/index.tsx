@@ -55,11 +55,7 @@ const Onboarding = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    if (!user) {
-      return;
-    } else if (user?.isKyc === false) {
-      router.replace("/kyc-onboarding" as any);
-    } else {
+    if (user) {
       router.replace("/home" as any);
     }
   }, [user]);

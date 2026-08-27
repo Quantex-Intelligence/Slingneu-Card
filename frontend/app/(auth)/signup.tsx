@@ -271,8 +271,8 @@ export default function Signup() {
             user: signupResponse.data?.user,
           })
         );
-        console.log("🔔 [Signup] Navigating to KYC onboarding");
-        router.replace("/(auth)/kyc-onboarding");
+        console.log("🔔 [Signup] Navigating to home portal");
+        router.replace("/(tabs)/home");
       } else {
         console.log(
           "❌ [Signup] Signup failed with status:",

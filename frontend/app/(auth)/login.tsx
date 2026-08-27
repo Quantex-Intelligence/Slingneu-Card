@@ -139,17 +139,8 @@ export default function Login() {
           })
         );
 
-        if (!response.data.user.isKyc) {
-          console.log(
-            "🔥 [Login] User needs KYC, navigating to KYC onboarding"
-          );
-          router.replace("/(auth)/kyc-onboarding");
-        } else {
-          console.log(
-            "🔥 [Login] User KYC complete, navigating to home"
-          );
-          router.replace("/(tabs)/home");
-        }
+        console.log("🔥 [Login] Navigating to home portal");
+        router.replace("/(tabs)/home");
       } else {
         Alert.alert("Error", response.data?.message || response.error?.response?.data?.message || "Invalid OTP");
       }
