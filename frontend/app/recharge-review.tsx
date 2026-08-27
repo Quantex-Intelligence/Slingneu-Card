@@ -192,7 +192,12 @@ export default function RechargeReviewScreen() {
 
   const handleBack = () => {
     try {
-      if (router.canGoBack()) {
+      if (Platform.OS === "web") {
+        router.push({
+          pathname: "/recharge-plan",
+          params: { service, number, operator, circle }
+        } as any);
+      } else if (router.canGoBack()) {
         router.back();
       } else {
         router.push({
@@ -447,6 +452,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.2)",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 99,
+    cursor: "pointer" as any,
   },
   headerTitle: {
     color: "#fff",

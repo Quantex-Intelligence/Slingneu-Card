@@ -158,7 +158,9 @@ export default function OfferDetail() {
 
   const handleBack = () => {
     try {
-      if (router.canGoBack()) {
+      if (Platform.OS === "web") {
+        router.push("/offer-list" as any);
+      } else if (router.canGoBack()) {
         router.back();
       } else {
         router.replace("/offer-list" as any);

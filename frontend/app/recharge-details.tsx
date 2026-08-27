@@ -96,7 +96,9 @@ export default function RechargeDetailsScreen() {
 
   const handleBack = () => {
     try {
-      if (router.canGoBack()) {
+      if (Platform.OS === "web") {
+        router.push("/recharge" as any);
+      } else if (router.canGoBack()) {
         router.back();
       } else {
         router.replace("/recharge" as any);
@@ -254,6 +256,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.2)",
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 99,
+    cursor: "pointer" as any,
   },
   headerTitle: {
     color: "#fff",
