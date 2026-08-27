@@ -116,6 +116,21 @@ export default function RechargePlanScreen() {
     fetchPlans();
   }, [operator, circle]);
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.push({
+          pathname: "/recharge-details",
+          params: { service, number, operator, circle }
+        } as any);
+      }
+    } catch (e) {
+      router.push("/recharge" as any);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#6c56f9" translucent={true} />
@@ -126,7 +141,7 @@ export default function RechargePlanScreen() {
         style={styles.header}
       >
         <View style={styles.headerContent}>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Select Plan</Text>

@@ -128,6 +128,18 @@ export default function OfferList() {
     fetchOffers(true);
   };
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/(tabs)/home" as any);
+      }
+    } catch (e) {
+      router.replace("/(tabs)/home" as any);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -138,7 +150,7 @@ export default function OfferList() {
           style={styles.headerContainer}
         >
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={handleBack}>
               <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Exclusive Deals</Text>
@@ -162,7 +174,7 @@ export default function OfferList() {
         style={styles.headerContainer}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={handleBack}>
             <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Exclusive Deals</Text>

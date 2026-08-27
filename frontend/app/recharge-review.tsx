@@ -190,6 +190,21 @@ export default function RechargeReviewScreen() {
     }
   };
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.push({
+          pathname: "/recharge-plan",
+          params: { service, number, operator, circle }
+        } as any);
+      }
+    } catch (e) {
+      router.push("/recharge" as any);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -206,7 +221,7 @@ export default function RechargeReviewScreen() {
         <View style={styles.headerContent}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={handleBack}
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>

@@ -47,6 +47,18 @@ export default function RechargeScreen() {
     </TouchableOpacity>
   );
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/(tabs)/home" as any);
+      }
+    } catch (e) {
+      router.replace("/(tabs)/home" as any);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -64,7 +76,7 @@ export default function RechargeScreen() {
         <View style={styles.headerContent}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={handleBack}
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>

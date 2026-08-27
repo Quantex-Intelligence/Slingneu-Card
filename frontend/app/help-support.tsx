@@ -46,6 +46,18 @@ export default function HelpSupport() {
     </html>
   `;
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/(tabs)/profile" as any);
+      }
+    } catch (e) {
+      router.replace("/(tabs)/profile" as any);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -55,7 +67,7 @@ export default function HelpSupport() {
         style={styles.headerContainer}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={handleBack}>
             <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Help & Support</Text>

@@ -156,6 +156,18 @@ export default function OfferDetail() {
     );
   }
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/offer-list" as any);
+      }
+    } catch (e) {
+      router.replace("/offer-list" as any);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -165,7 +177,7 @@ export default function OfferDetail() {
         style={styles.headerContainer}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
+          <TouchableOpacity onPress={handleBack}>
             <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Exclusive Deals</Text>

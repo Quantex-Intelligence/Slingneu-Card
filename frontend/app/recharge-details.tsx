@@ -94,6 +94,18 @@ export default function RechargeDetailsScreen() {
     if (user?.phone) setNumber(user.phone);
   }, [user]);
 
+  const handleBack = () => {
+    try {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace("/recharge" as any);
+      }
+    } catch (e) {
+      router.replace("/recharge" as any);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar
@@ -110,7 +122,7 @@ export default function RechargeDetailsScreen() {
         <View style={styles.headerContent}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={handleBack}
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
