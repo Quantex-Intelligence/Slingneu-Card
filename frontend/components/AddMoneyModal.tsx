@@ -417,19 +417,20 @@ export default function AddMoneyModal({
                   <Text style={styles.cancelButtonText}>Cancel</Text>
                 </TouchableOpacity>
 
-                <LinearGradient
-                  colors={["#6c56f9", "#8b5cf6"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                <TouchableOpacity
+                  onPress={handleSubmit}
+                  disabled={isLoading}
                   style={[
                     styles.submitButton,
                     isLoading && styles.submitButtonDisabled,
                   ]}
+                  activeOpacity={0.8}
                 >
-                  <TouchableOpacity
-                    onPress={handleSubmit}
+                  <LinearGradient
+                    colors={["#6c56f9", "#8b5cf6"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
                     style={styles.submitButtonTouchable}
-                    disabled={isLoading}
                   >
                     {isLoading ? (
                       <>
@@ -450,8 +451,8 @@ export default function AddMoneyModal({
                         <Text style={styles.submitButtonText}>Add Money</Text>
                       </>
                     )}
-                  </TouchableOpacity>
-                </LinearGradient>
+                  </LinearGradient>
+                </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
@@ -604,6 +605,7 @@ const styles = StyleSheet.create({
   submitButton: {
     flex: 2,
     borderRadius: 16,
+    overflow: "hidden",
     shadowColor: "#6c56f9",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
@@ -618,6 +620,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
+    borderRadius: 16,
+    width: "100%",
   },
   submitButtonText: {
     fontSize: 16,
