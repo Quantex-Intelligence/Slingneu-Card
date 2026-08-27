@@ -37,7 +37,8 @@ class TCSLINGNEOController {
     // Load Wallet
     async loadWallet(req, res) {
         try {
-            const result = await tcsligneoService.loadWallet(req.body);
+            const authUserId = req.user?._id || req.user?.id || req.user?.userId;
+            const result = await tcsligneoService.loadWallet(req.body, authUserId);
             res.json(result);
         } catch (error) {
             res.status(error.status || 500).json(error);
