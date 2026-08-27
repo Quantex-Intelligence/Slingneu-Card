@@ -42,105 +42,76 @@ export default function RechargePlanScreen() {
   if (!operatorData || !operatorData.code) operatorData = { code: "AIRTEL", name: "Airtel" };
   if (!circleData || !circleData.code) circleData = { code: "DL", name: "Delhi & NCR" };
 
+  const defaultPlansList = [
+    {
+      planId: "p1",
+      planName: "Unlimited 1.5GB/Day",
+      amount: 299,
+      description: "Truly Unlimited Calls + 1.5GB/day Data + 100 SMS/day",
+      validity: 28,
+      validityType: "days",
+      data: 1.5,
+      dataUnit: "GB/day",
+      talktime: 100,
+      isPopular: true,
+      isBestSeller: true,
+    },
+    {
+      planId: "p2",
+      planName: "Super Saver 2GB/Day",
+      amount: 349,
+      description: "Truly Unlimited Calls + 2GB/day Data + 100 SMS/day + OTT Benefits",
+      validity: 28,
+      validityType: "days",
+      data: 2.0,
+      dataUnit: "GB/day",
+      talktime: 100,
+      isSpecialOffer: true,
+    },
+    {
+      planId: "p3",
+      planName: "Annual Value Pack",
+      amount: 2999,
+      description: "Truly Unlimited Calls + 2.5GB/day Data + 100 SMS/day for 365 Days",
+      validity: 365,
+      validityType: "days",
+      data: 2.5,
+      dataUnit: "GB/day",
+      talktime: 100,
+      isBestSeller: true,
+    },
+    {
+      planId: "p4",
+      planName: "Data Booster 6GB",
+      amount: 61,
+      description: "High speed 6GB Data Add-on (Existing Plan Validity)",
+      validity: 0,
+      data: 6,
+      dataUnit: "GB",
+    }
+  ];
+
   const [selectedPlan, setSelectedPlan] = useState<string | null>("p1");
-  const [plans, setPlans] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState<any[]>(defaultPlansList);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedPlanDetails, setSelectedPlanDetails] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     async function fetchPlans() {
-      setLoading(true);
-      setError("");
       try {
         const res = await Api.call(`/api/recharge-plans/plans/${operatorData.code}/${circleData.code}`, "GET");
         let loadedPlans = res?.data?.data || [];
-        if (!loadedPlans.length) {
-          loadedPlans = [
-            {
-              planId: "p1",
-              planName: "Unlimited 1.5GB/Day",
-              amount: 299,
-              description: "Truly Unlimited Calls + 1.5GB/day Data + 100 SMS/day",
-              validity: 28,
-              validityType: "days",
-              data: 1.5,
-              dataUnit: "GB/day",
-              talktime: 100,
-              isPopular: true,
-              isBestSeller: true,
-            },
-            {
-              planId: "p2",
-              planName: "Super Saver 2GB/Day",
-              amount: 349,
-              description: "Truly Unlimited Calls + 2GB/day Data + 100 SMS/day + OTT Benefits",
-              validity: 28,
-              validityType: "days",
-              data: 2.0,
-              dataUnit: "GB/day",
-              talktime: 100,
-              isSpecialOffer: true,
-            },
-            {
-              planId: "p3",
-              planName: "Annual Value Pack",
-              amount: 2999,
-              description: "Truly Unlimited Calls + 2.5GB/day Data + 100 SMS/day for 365 Days",
-              validity: 365,
-              validityType: "days",
-              data: 2.5,
-              dataUnit: "GB/day",
-              talktime: 100,
-              isBestSeller: true,
-            },
-            {
-              planId: "p4",
-              planName: "Data Booster 6GB",
-              amount: 61,
-              description: "High speed 6GB Data Add-on (Existing Plan Validity)",
-              validity: 0,
-              data: 6,
-              dataUnit: "GB",
-            }
-          ];
-        }
-        setPlans(loadedPlans);
-        if (loadedPlans.length > 0 && !selectedPlan) {
-          setSelectedPlan(loadedPlans[0].planId);
+        if (loadedPlans.length) {
+          setPlans(loadedPlans);
+          if (!selectedPlan) {
+            setSelectedPlan(loadedPlans[0].planId);
+          }
         }
       } catch (e) {
         console.log("Notice loading plans, using default plans:", e);
-        const defaultPlans = [
-          {
-            planId: "p1",
-            planName: "Unlimited 1.5GB/Day",
-            amount: 299,
-            description: "Truly Unlimited Calls + 1.5GB/day Data + 100 SMS/day",
-            validity: 28,
-            validityType: "days",
-            data: 1.5,
-            dataUnit: "GB/day",
-            talktime: 100,
-            isPopular: true,
-          },
-          {
-            planId: "p2",
-            planName: "Super Saver 2GB/Day",
-            amount: 349,
-            description: "Truly Unlimited Calls + 2GB/day Data + 100 SMS/day",
-            validity: 28,
-            validityType: "days",
-            data: 2.0,
-            dataUnit: "GB/day",
-            talktime: 100,
-          }
-        ];
-        setPlans(defaultPlans);
-        setSelectedPlan(defaultPlans[0].planId);
       }
-      setLoading(false);
     }
     fetchPlans();
   }, [operator, circle]);
