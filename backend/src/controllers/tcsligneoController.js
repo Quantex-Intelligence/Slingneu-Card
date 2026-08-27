@@ -44,6 +44,17 @@ class TCSLINGNEOController {
         }
     }
 
+    // Fetch Balance
+    async fetchBalance(req, res) {
+        try {
+            const { entityId } = req.params;
+            const result = await tcsligneoService.fetchBalance(entityId);
+            res.json(result);
+        } catch (error) {
+            res.status(error.status || 500).json(error);
+        }
+    }
+
     // Card Lock/Unlock
     async cardLockUnlock(req, res) {
         try {

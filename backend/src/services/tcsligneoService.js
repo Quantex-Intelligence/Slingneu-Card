@@ -447,6 +447,34 @@ class TCSLINGNEOService {
     }
   }
 
+  // Fetch Balance
+  async fetchBalance(entityId) {
+    try {
+      const user = await this.findUserByIdentifier(entityId);
+      const balance = user ? (user.walletBalance || 0) : 0;
+      return {
+        status: "SUCCESS",
+        result: [
+          {
+            balance: balance,
+            entityId: entityId
+          }
+        ]
+      };
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      return {
+        status: "SUCCESS",
+        result: [
+          {
+            balance: 0,
+            entityId: entityId
+          }
+        ]
+      };
+    }
+  }
+
   // Card Lock/Unlock
   async cardLockUnlock(entityId, kitNo, flag, reason) {
     try {

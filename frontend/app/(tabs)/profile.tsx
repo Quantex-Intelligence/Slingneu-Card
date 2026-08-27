@@ -1,3 +1,5 @@
+import AddMoneyModal from "@/components/AddMoneyModal";
+import Api from "@/config/Api";
 import UserProfileModal from "@/components/UserProfileModal";
 import { logout } from "@/store/slices/authSlice";
 import {
@@ -5,8 +7,9 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   Alert,
   Image,
@@ -22,9 +25,34 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 export default function Profile() {
-  const { user } = useSelector((state: any) => state.auth);
+  const { user, token } = useSelector((state: any) => state.auth);
   const dispatch = useDispatch();
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAddMoneyModal, setShowAddMoneyModal] = useState(false);
+  const [balance, setBalance] = useState(0);
+
+  const fetchBalance = async () => {
+    try {
+      if (user?.phone) {
+        const res = await Api.call(
+          `/api/slingneo/balance/${"TSCSLINGNEO" + user?.phone}`,
+          "GET",
+          {},
+          token
+        );
+        const bal = res?.data?.result?.[0]?.balance ?? 0;
+        setBalance(bal);
+      }
+    } catch (e) {
+      console.log("Error fetching balance in profile:", e);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchBalance();
+    }, [user?.phone])
+  );
 
   const performLogout = () => {
     dispatch(logout());
@@ -85,6 +113,34 @@ export default function Profile() {
           />
           <Text style={styles.profileName}>{user?.name}</Text>
           <Text style={styles.profileUsername}>{user?.phone}</Text>
+        </View>
+
+        {/* Wallet Balance Card */}
+        <View style={styles.balanceSection}>
+          <LinearGradient
+            colors={["#6c56f9", "#8b5cf6"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.balanceCard}
+          >
+            <View style={styles.balanceHeader}>
+              <View style={styles.balanceIconWrapper}>
+                <MaterialCommunityIcons name="wallet-outline" size={24} color="#fff" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.balanceLabel}>Total Wallet Balance</Text>
+                <Text style={styles.balanceAmount}>₹{balance.toLocaleString()}</Text>
+              </View>
+              <TouchableOpacity
+                style={styles.addMoneyBtn}
+                onPress={() => setShowAddMoneyModal(true)}
+                activeOpacity={0.85}
+              >
+                <Feather name="plus" size={16} color="#6c56f9" />
+                <Text style={styles.addMoneyBtnText}>Add Money</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
         </View>
 
         {/* Personal Info */}
@@ -268,6 +324,14 @@ export default function Profile() {
         onClose={() => setShowProfileModal(false)}
         user={user}
       />
+
+      <AddMoneyModal
+        visible={showAddMoneyModal}
+        onClose={() => {
+          setShowAddMoneyModal(false);
+          fetchBalance();
+        }}
+      />
     </SafeAreaView>
   );
 }
@@ -276,6 +340,59 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#F8F9FA",
+  },
+  balanceSection: {
+    paddingHorizontal: 16,
+    marginTop: 16,
+  },
+  balanceCard: {
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#6c56f9",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  balanceHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  balanceIconWrapper: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  balanceLabel: {
+    fontSize: 12,
+    color: "rgba(255, 255, 255, 0.8)",
+    fontWeight: "500",
+    fontFamily: "SpaceMono-Regular",
+  },
+  balanceAmount: {
+    fontSize: 22,
+    color: "#fff",
+    fontWeight: "bold",
+    fontFamily: "SpaceMono-Regular",
+    marginTop: 2,
+  },
+  addMoneyBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    gap: 4,
+  },
+  addMoneyBtnText: {
+    color: "#6c56f9",
+    fontWeight: "bold",
+    fontSize: 13,
+    fontFamily: "SpaceMono-Regular",
   },
   container: {
     paddingBottom: 10,
