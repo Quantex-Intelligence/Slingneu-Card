@@ -17,14 +17,11 @@ export default function RechargeScreen() {
 
   const services = [
     { id: "mobile", name: "Mobile", icon: "cellphone", color: "#4CAF50" },
-    // { id: "dth", name: "DTH", icon: "television", color: "#2196F3" },
-    // { id: "electricity", name: "Electricity", icon: "lightning-bolt", color: "#FF9800" },
-    // { id: "gas", name: "Gas", icon: "fire", color: "#F44336" },
-    // { id: "landline", name: "Landline", icon: "phone", color: "#9C27B0" },
-    // { id: "insurance", name: "Insurance", icon: "shield-check", color: "#607D8B" },
-    // { id: "datacard", name: "Data Card", icon: "wifi", color: "#9C27B0" },
-    // { id: "fastag", name: "Fastag", icon: "car", color: "#FF5722" },
-    // { id: "other", name: "Other", icon: "dots-horizontal", color: "#795548" },
+    { id: "dth", name: "DTH", icon: "television", color: "#2196F3" },
+    { id: "electricity", name: "Electricity", icon: "lightning-bolt", color: "#FF9800" },
+    { id: "fastag", name: "Fastag", icon: "car", color: "#FF5722" },
+    { id: "gas", name: "Gas", icon: "fire", color: "#F44336" },
+    { id: "landline", name: "Landline", icon: "phone", color: "#9C27B0" },
   ];
 
   const renderServiceButton = (service: any) => (

@@ -365,7 +365,8 @@ class RechargeController {
         });
       }
 
-      const filter = { userId: req.user.userId };
+      const userId = req.user?.userId || req.user?._id || req.user?.id;
+      const filter = { userId };
       const transactions = await RechargeTransaction.find(filter).sort({
         createdAt: -1,
       });

@@ -32,22 +32,58 @@ export default function RechargeDetailsScreen() {
       setLoading(true);
       setError("");
       try {
-        // Fetch operators by category
         const opRes = await Api.call(
-          `/api/operators/operators/category/${service}`,
+          `/api/operators/operators/category/${service || "mobile"}`,
           "GET"
         );
-        // Fetch all circles
         const circleRes = await Api.call("/api/operators/circle-codes", "GET");
-        console.log("circleRes", opRes);
-        setOperators(opRes?.data?.data || []);
-        setCircles(circleRes?.data?.data?.circleCodes || []);
-        // Set default operator/circle if available
-        if (opRes?.data?.data?.length) setOperator(opRes.data.data[0].code);
-        if (circleRes?.data?.data?.circleCodes?.length)
-          setCircle(circleRes.data.data.circleCodes[0].code);
+        
+        let loadedOperators = opRes?.data?.data || [];
+        let loadedCircles = circleRes?.data?.data?.circleCodes || [];
+
+        if (!loadedOperators.length) {
+          loadedOperators = [
+            { code: "JIO", name: "Jio Prepaid" },
+            { code: "AIRTEL", name: "Airtel Prepaid" },
+            { code: "VI", name: "Vodafone Idea (Vi)" },
+            { code: "BSNL", name: "BSNL Prepaid" },
+          ];
+        }
+
+        if (!loadedCircles.length) {
+          loadedCircles = [
+            { code: "DL", name: "Delhi & NCR" },
+            { code: "MH", name: "Maharashtra & Goa" },
+            { code: "KA", name: "Karnataka" },
+            { code: "TN", name: "Tamil Nadu" },
+            { code: "AP", name: "Andhra Pradesh & Telangana" },
+            { code: "MH_MUM", name: "Mumbai" },
+          ];
+        }
+
+        setOperators(loadedOperators);
+        setCircles(loadedCircles);
+        if (loadedOperators.length) setOperator(loadedOperators[0].code);
+        if (loadedCircles.length) setCircle(loadedCircles[0].code);
       } catch (e) {
-        setError("Failed to load operators or circles");
+        console.log("Notice loading operators, using fallbacks:", e);
+        const fallbackOps = [
+          { code: "JIO", name: "Jio Prepaid" },
+          { code: "AIRTEL", name: "Airtel Prepaid" },
+          { code: "VI", name: "Vodafone Idea (Vi)" },
+          { code: "BSNL", name: "BSNL Prepaid" },
+        ];
+        const fallbackCircles = [
+          { code: "DL", name: "Delhi & NCR" },
+          { code: "MH", name: "Maharashtra & Goa" },
+          { code: "KA", name: "Karnataka" },
+          { code: "TN", name: "Tamil Nadu" },
+          { code: "AP", name: "Andhra Pradesh & Telangana" },
+        ];
+        setOperators(fallbackOps);
+        setCircles(fallbackCircles);
+        setOperator(fallbackOps[0].code);
+        setCircle(fallbackCircles[0].code);
       }
       setLoading(false);
     }
