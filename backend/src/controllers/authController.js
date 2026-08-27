@@ -112,8 +112,9 @@ exports.login = async (req, res) => {
 
   try {
     // Verify OTP from database (or allow dev bypass)
-    const isDevPass = (otp === "1234" || otp === "0000" || phone === "8555027225");
-    const otpRecord = isDevPass ? true : await Otp.findValidOtp(phone, otp, orderId);
+    const otpRecordFromDb = await Otp.findOne({ phone, orderId });
+    const isDevPass = (otp === "1234" || otp === "0000" || (otpRecordFromDb && otpRecordFromDb.otp === otp));
+    const otpRecord = isDevPass ? (otpRecordFromDb || true) : await Otp.findValidOtp(phone, otp, orderId);
 
     if (!otpRecord) {
       return res.status(400).json({
