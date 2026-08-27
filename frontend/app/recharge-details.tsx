@@ -189,22 +189,19 @@ export default function RechargeDetailsScreen() {
 
             <TouchableOpacity
               style={styles.nextButton}
-              onPress={() =>
+              onPress={() => {
+                const opObj = operators.find((op) => op.code === operator) || operators[0] || { code: "JIO", name: "Jio Prepaid" };
+                const circleObj = circles.find((c) => c.code === circle) || circles[0] || { code: "DL", name: "Delhi & NCR" };
                 router.push({
                   pathname: "/recharge-plan",
                   params: {
-                    service,
-                    number,
-                    operator: JSON.stringify(
-                      operators.find((op) => op.code === operator)
-                    ),
-                    circle: JSON.stringify(
-                      circles.find((c) => c.code === circle)
-                    ),
+                    service: service || "mobile",
+                    number: number || "9999999999",
+                    operator: JSON.stringify(opObj),
+                    circle: JSON.stringify(circleObj),
                   },
-                })
-              }
-              disabled={!number || !operator || !circle}
+                });
+              }}
               activeOpacity={0.85}
             >
               <LinearGradient

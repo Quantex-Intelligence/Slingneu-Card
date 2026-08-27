@@ -16,9 +16,33 @@ import Api from "../config/Api";
 export default function RechargePlanScreen() {
   const router = useRouter();
   const { service, number, operator, circle } = useLocalSearchParams();
-let operatorData = JSON.parse(operator as string);
-let circleData = JSON.parse(circle as string);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  let operatorData: any = { code: "AIRTEL", name: "Airtel" };
+  let circleData: any = { code: "DL", name: "Delhi & NCR" };
+
+  try {
+    if (typeof operator === "string" && operator.trim().startsWith("{")) {
+      operatorData = JSON.parse(operator);
+    } else if (operator && typeof operator === "object") {
+      operatorData = operator;
+    }
+  } catch (e) {
+    console.log("Safe operator parse fallback:", e);
+  }
+
+  try {
+    if (typeof circle === "string" && circle.trim().startsWith("{")) {
+      circleData = JSON.parse(circle);
+    } else if (circle && typeof circle === "object") {
+      circleData = circle;
+    }
+  } catch (e) {
+    console.log("Safe circle parse fallback:", e);
+  }
+
+  if (!operatorData || !operatorData.code) operatorData = { code: "AIRTEL", name: "Airtel" };
+  if (!circleData || !circleData.code) circleData = { code: "DL", name: "Delhi & NCR" };
+
+  const [selectedPlan, setSelectedPlan] = useState<string | null>("p1");
   const [plans, setPlans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -83,9 +107,12 @@ let circleData = JSON.parse(circle as string);
           ];
         }
         setPlans(loadedPlans);
+        if (loadedPlans.length > 0 && !selectedPlan) {
+          setSelectedPlan(loadedPlans[0].planId);
+        }
       } catch (e) {
         console.log("Notice loading plans, using default plans:", e);
-        setPlans([
+        const defaultPlans = [
           {
             planId: "p1",
             planName: "Unlimited 1.5GB/Day",
@@ -109,7 +136,9 @@ let circleData = JSON.parse(circle as string);
             dataUnit: "GB/day",
             talktime: 100,
           }
-        ]);
+        ];
+        setPlans(defaultPlans);
+        setSelectedPlan(defaultPlans[0].planId);
       }
       setLoading(false);
     }

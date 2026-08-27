@@ -25,9 +25,39 @@ export default function RechargeReviewScreen() {
   const router = useRouter();
   const { service, number, operator, circle, plan, amount } =
     useLocalSearchParams();
-  const operatorData = JSON.parse(operator as string);
-  const circleData = JSON.parse(circle as string);
-  const planData = JSON.parse(plan as string);
+  let operatorData: any = {};
+  let circleData: any = {};
+  let planData: any = {};
+
+  try {
+    if (typeof operator === "string" && operator.trim().startsWith("{")) {
+      operatorData = JSON.parse(operator);
+    } else if (operator && typeof operator === "object") {
+      operatorData = operator;
+    }
+  } catch (e) {
+    operatorData = { name: "Airtel", code: "AIRTEL" };
+  }
+
+  try {
+    if (typeof circle === "string" && circle.trim().startsWith("{")) {
+      circleData = JSON.parse(circle);
+    } else if (circle && typeof circle === "object") {
+      circleData = circle;
+    }
+  } catch (e) {
+    circleData = { name: "Delhi & NCR", code: "DL" };
+  }
+
+  try {
+    if (typeof plan === "string" && plan.trim().startsWith("{")) {
+      planData = JSON.parse(plan);
+    } else if (plan && typeof plan === "object") {
+      planData = plan;
+    }
+  } catch (e) {
+    planData = { planName: "Unlimited 1.5GB/Day", amount: amount || 299 };
+  }
 
 
   const [loading, setLoading] = useState(false);
